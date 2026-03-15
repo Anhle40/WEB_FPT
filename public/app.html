@@ -1,0 +1,1286 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>FPTU Survival Kit - V18 Chat Final</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    /* CORE UI */
+    body { background-color: #f0f2f5; overflow-x: hidden; font-family: 'Segoe UI', sans-serif; }
+    .view-section { transition: opacity 0.2s ease-in-out; }
+    .hidden-view { display: none !important; opacity: 0; }
+    .active-view { display: flex !important; opacity: 1; animation: slideUp 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+    @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+    /* Glassmorphism */
+    .glass-nav { background: rgba(255, 255, 255, 0.95); backdrop-filter: blur(12px); border-bottom: 1px solid rgba(0,0,0,0.05); }
+    .glass-card { background: white; border: 1px solid rgba(0,0,0,0.05); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); }
+
+    /* Scrollbar */
+    .custom-scrollbar::-webkit-scrollbar { width: 5px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    
+    /* Tags */
+    .tag-hard { background: #fee2e2; color: #991b1b; font-size: 10px; padding: 2px 8px; border-radius: 99px; font-weight: 700; border: 1px solid #fecaca; }
+    .tag-medium { background: #fef9c3; color: #854d0e; font-size: 10px; padding: 2px 8px; border-radius: 99px; border: 1px solid #fde047; }
+    .tag-easy { background: #dcfce7; color: #166534; font-size: 10px; padding: 2px 8px; border-radius: 99px; border: 1px solid #bbf7d0; }
+
+    /* text wrapping helpers */
+    body, .view-section, .flex, #chat-messages, #social-feed, .bg-white, .bg-slate-50 {
+      word-break: break-word;
+      overflow-wrap: anywhere;
+    }
+    /* Typing Animation */
+    .typing-indicator span { display: inline-block; width: 5px; height: 5px; background-color: #9ca3af; border-radius: 50%; animation: typing 1.4s infinite ease-in-out both; margin: 0 1px; }
+    .typing-indicator span:nth-child(1) { animation-delay: -0.32s; }
+    .typing-indicator span:nth-child(2) { animation-delay: -0.16s; }
+    @keyframes typing { 0%, 80%, 100% { transform: scale(0); } 40% { transform: scale(1); } }
+  </style>
+  
+  <!-- 🔥 Firebase Integration -->
+  <script src="firebase-integration.html"></script>
+  
+  <!-- 🎨 Markdown Formatter -->
+  <script src="markdown-formatter.js"></script>
+</head>
+<body class="text-slate-800 h-screen flex flex-col break-words">
+
+  <section id="login-screen" class="fixed inset-0 z-[100] bg-slate-900 flex items-center justify-center p-4">
+    <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1517694712202-14dd9538aa97?q=80&w=2070')] bg-cover opacity-20"></div>
+    <div class="bg-white/10 backdrop-blur-2xl border border-white/20 p-10 rounded-3xl w-full max-w-lg shadow-2xl text-center text-white relative z-10">
+        <div class="mb-8">
+            <i class="fa-solid fa-layer-group text-6xl text-orange-500 mb-4 inline-block"></i>
+            <h1 class="text-4xl font-black tracking-tight">SURVIVAL<span class="text-orange-500">KIT</span></h1>
+            <p class="text-slate-300 text-lg mt-2">Hệ sinh thái FPTU Survival</p>
+        </div>
+        <form onsubmit="event.preventDefault(); handleLogin();" class="space-y-5 text-left">
+            <div>
+                <label class="text-sm font-bold text-slate-300 ml-1 mb-1 block">Tên hiển thị</label>
+                <input type="text" id="fullname" class="w-full bg-slate-800/50 border border-slate-500 text-white text-lg rounded-2xl p-4 outline-none focus:border-orange-500 transition" placeholder="VD: Minh Tuấn" required>
+            </div>
+            <div>
+                <label class="text-sm font-bold text-slate-300 ml-1 mb-1 block">MSSV</label>
+                <input type="text" id="mssv" class="w-full bg-slate-800/50 border border-slate-500 text-white text-lg rounded-2xl p-4 outline-none focus:border-orange-500 transition" placeholder="VD: DE18xxxx" required>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+                <div>
+                    <label class="text-sm font-bold text-slate-300 ml-1 mb-1 block">Campus</label>
+                    <div class="relative">
+                        <select id="campus" class="w-full bg-slate-800/50 border border-slate-500 text-white text-lg rounded-2xl p-4 outline-none cursor-pointer appearance-none">
+                            <option value="Đà Nẵng">Đà Nẵng</option>
+                            <option value="Hà Nội">Hà Nội</option>
+                            <option value="HCM">TP. HCM</option>
+                            <option value="Cần Thơ">Cần Thơ</option>
+                            <option value="Quy Nhơn">Quy Nhơn</option>
+                        </select>
+                        <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+                <div>
+                    <label class="text-sm font-bold text-slate-300 ml-1 mb-1 block">Khối Ngành</label>
+                    <div class="relative">
+                        <select id="faculty" class="w-full bg-slate-800/50 border border-slate-500 text-white text-lg rounded-2xl p-4 outline-none cursor-pointer appearance-none">
+                            <option value="IT_FACULTY">Khối CNTT</option>
+                            <option value="BIZ_FACULTY">Khối Kinh Tế</option>
+                            <option value="LANG_FACULTY">Khối Ngôn Ngữ</option>
+                        </select>
+                         <i class="fa-solid fa-chevron-down absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none"></i>
+                    </div>
+                </div>
+            </div>
+            <button type="submit" class="w-full bg-orange-600 hover:bg-orange-500 text-white font-bold text-lg py-4 rounded-2xl mt-6 shadow-lg shadow-orange-900/20 transition transform hover:scale-[1.02]">Đăng Nhập Ngay</button>
+        </form>
+    </div>
+  </section>
+
+  <div id="main-app" class="hidden flex-col h-full">
+      <header class="fixed top-0 w-full glass-nav z-50 h-20">
+        <div class="max-w-6xl mx-auto flex items-center justify-between h-full px-6">
+          <div class="flex items-center gap-3 cursor-pointer" onclick="switchView('home')">
+              <i class="fa-solid fa-compass text-orange-600 text-3xl"></i>
+              <h1 class="text-2xl font-black tracking-tighter text-slate-900 hidden md:block">SURVIVAL<span class="text-orange-600">KIT</span></h1>
+          </div>
+          
+          <nav class="flex bg-slate-100 p-2 rounded-xl gap-2">
+            <button onclick="switchView('home')" id="btn-home" class="px-4 py-2 rounded-lg text-slate-500 hover:bg-white hover:text-orange-600 shadow-sm transition"><i class="fa-solid fa-house"></i></button>
+            <button onclick="switchView('community')" id="btn-community" class="px-4 py-2 rounded-lg text-slate-500 hover:bg-white hover:text-orange-600 transition"><i class="fa-solid fa-users"></i></button>
+            <button onclick="switchView('tools-menu')" id="btn-tools-menu" class="px-4 py-2 rounded-lg text-slate-500 hover:bg-white hover:text-orange-600 transition"><i class="fa-solid fa-toolbox"></i></button>
+            <button onclick="switchView('chat')" id="btn-chat" class="px-4 py-2 rounded-lg text-slate-500 hover:bg-white hover:text-blue-600 transition"><i class="fa-solid fa-comments"></i></button>
+            <button onclick="switchView('guide')" id="btn-guide" class="px-4 py-2 rounded-lg text-slate-500 hover:bg-white hover:text-green-600 transition"><i class="fa-solid fa-book-open"></i></button>
+          </nav>
+
+          <div class="flex items-center gap-3">
+               <span class="hidden md:block font-bold text-slate-700 text-right text-xs leading-tight">Chào,<br><span id="header-username" class="text-orange-600">Sinh viên</span></span>
+               <div class="w-9 h-9 rounded-full bg-orange-600 text-white flex items-center justify-center font-bold text-sm shadow-md" id="user-avatar">?</div>
+          </div>
+      </header>
+      <div class="h-20"></div> 
+<section id="view-home" class="view-section active-view flex-1 bg-slate-50 overflow-y-auto custom-scrollbar">
+        <div class="max-w-5xl mx-auto p-6 pt-12"> <div class="bg-gradient-to-r from-slate-900 to-slate-800 rounded-3xl p-10 text-white text-center mb-10 shadow-xl relative overflow-hidden group">
+                <div class="absolute top-0 right-0 w-40 h-40 bg-orange-500/20 rounded-full blur-3xl group-hover:bg-orange-500/30 transition"></div>
+                <h2 class="text-3xl md:text-4xl font-bold mb-3">Xin chào, <span id="welcome-name" class="text-orange-400">Bạn</span>! 👋</h2>
+                <p class="opacity-80 text-base">Sinh viên <span id="welcome-faculty" class="font-bold text-white">--</span> • <span id="welcome-campus">--</span></p>
+            </div>
+            
+            <h3 class="text-xl font-bold text-slate-700 mb-6 px-2">Truy cập nhanh</h3>
+
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+                <div onclick="switchView('tools-menu')" class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 cursor-pointer hover:border-orange-300 transition border border-slate-100 group hover:-translate-y-1">
+                    <div class="w-16 h-16 bg-orange-50 rounded-full flex items-center justify-center text-orange-600 text-3xl group-hover:bg-orange-600 group-hover:text-white transition"><i class="fa-solid fa-briefcase"></i></div>
+                    <div class="text-center"><span class="font-bold text-slate-800 text-lg block">Bộ Công Cụ</span><p class="text-slate-500 text-sm mt-2">Wiki, Deadline, AI Check</p></div>
+                </div>
+                <div onclick="switchView('community')" class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 cursor-pointer hover:border-purple-300 transition border border-slate-100 group hover:-translate-y-1">
+                    <div class="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center text-purple-600 text-3xl group-hover:bg-purple-600 group-hover:text-white transition"><i class="fa-solid fa-users"></i></div>
+                    <div class="text-center"><span class="font-bold text-slate-800 text-lg block">Cộng đồng</span><p class="text-slate-500 text-sm mt-2">Review, Confession</p></div>
+                </div>
+                <div onclick="switchView('guide')" class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 cursor-pointer hover:border-green-300 transition border border-slate-100 group hover:-translate-y-1">
+                    <div class="w-16 h-16 bg-green-50 rounded-full flex items-center justify-center text-green-600 text-3xl group-hover:bg-green-600 group-hover:text-white transition"><i class="fa-solid fa-book-open"></i></div>
+                    <div class="text-center"><span class="font-bold text-slate-800 text-lg block">Cẩm Nang Sinh Tồn</span><p class="text-slate-500 text-sm mt-2">Mẹo sống sót FPTU</p></div>
+                </div>
+                <div onclick="switchView('chat')" class="glass-card p-8 rounded-3xl flex flex-col items-center gap-4 cursor-pointer hover:border-blue-300 transition border border-slate-100 group hover:-translate-y-1">
+                    <div class="w-16 h-16 bg-blue-50 rounded-full flex items-center justify-center text-blue-600 text-3xl group-hover:bg-blue-600 group-hover:text-white transition"><i class="fa-solid fa-comments"></i></div>
+                    <div class="text-center"><span class="font-bold text-slate-800 text-lg block">SOS Chatbot</span><p class="text-slate-500 text-sm mt-2">Hỏi đáp, Tâm sự</p></div>
+                </div>
+            </div>
+        </div>
+      </section>
+
+      <section id="view-tools-menu" class="view-section hidden-view bg-slate-50 min-h-screen">
+         <div class="max-w-4xl mx-auto px-6 pt-12 pb-10">
+             <button onclick="switchView('home')" class="mb-8 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại Home</button>
+             
+             <h2 class="text-3xl font-black text-slate-800 mb-8 flex items-center gap-3"><i class="fa-solid fa-screwdriver-wrench text-orange-600"></i> Kho Công Cụ</h2>
+             
+             <div class="grid md:grid-cols-2 gap-6">
+                 <div onclick="openWikiSelection()" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-indigo-400 hover:shadow-md transition flex items-center justify-between group min-h-32">
+                     <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-3xl group-hover:scale-110 transition"><i class="fa-solid fa-book-open"></i></div>
+                        <div><h4 class="font-bold text-slate-800 text-xl">Wiki Môn học</h4><p class="text-sm text-slate-500">Lộ trình 9 kỳ & Review</p></div>
+                     </div>
+                     <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                 </div>
+                 <div onclick="switchView('tool-calc')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-green-400 hover:shadow-md transition flex items-center justify-between group min-h-32">
+                     <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-xl bg-green-50 text-green-600 flex items-center justify-center text-3xl group-hover:scale-110 transition"><i class="fa-solid fa-calculator"></i></div>
+                        <div><h4 class="font-bold text-slate-800 text-xl">Tính điểm Pass</h4><p class="text-sm text-slate-500">Tính điểm thi Final</p></div>
+                     </div>
+                     <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                 </div>
+                 <div onclick="switchView('tool-deadline')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-red-400 hover:shadow-md transition flex items-center justify-between group min-h-32">
+                     <div class="flex items-center gap-5">
+                        <div class="w-14 h-14 rounded-xl bg-red-50 text-red-600 flex items-center justify-center text-3xl group-hover:scale-110 transition"><i class="fa-solid fa-list-check"></i></div>
+                        <div><h4 class="font-bold text-slate-800 text-xl">Quản lý Deadline</h4><p class="text-sm text-slate-500">Ma trận Eisenhower</p></div>
+                     </div>
+                     <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                 </div>
+                 <div onclick="switchView('tool-ai-check')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-200 cursor-pointer hover:border-purple-400 hover:shadow-md transition flex items-center justify-between group min-h-32">
+                     <div class="flex items-center gap-5">
+                         <div class="w-14 h-14 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-3xl group-hover:scale-110 transition"><i class="fa-solid fa-shield-halved"></i></div>
+                         <div><h4 class="font-bold text-slate-800 text-xl">Check Đạo văn AI</h4><p class="text-sm text-slate-500">Kiểm tra Prompt</p></div>
+                     </div>
+                     <i class="fa-solid fa-chevron-right text-slate-300"></i>
+                 </div>
+             </div>
+         </div>
+      </section>
+
+      <section id="view-wiki-select" class="view-section hidden-view bg-white min-h-screen py-8">
+          <div class="max-w-5xl mx-auto px-6">
+              <button onclick="switchView('tools-menu')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+              <h2 class="text-2xl font-bold text-slate-800 mb-2">Chọn Chuyên ngành</h2>
+              <p class="text-sm text-slate-500 mb-6">Bạn thuộc chuyên ngành nào trong khối <span id="wiki-faculty-name" class="font-bold">--</span>?</p>
+              <div id="wiki-spec-list" class="grid grid-cols-1 md:grid-cols-2 gap-4"></div>
+          </div>
+      </section>
+
+      <section id="view-wiki-roadmap" class="view-section hidden-view bg-white min-h-screen py-8 overflow-y-auto custom-scrollbar">
+          <div class="max-w-5xl mx-auto px-6">
+              <button onclick="switchView('wiki-select')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Chọn lại ngành</button>
+              <div class="mb-6 border-b pb-4"><h2 class="text-3xl font-bold text-slate-800"><i class="fa-solid fa-road text-orange-600 mr-2"></i> Lộ trình: <span id="roadmap-title" class="text-indigo-600">--</span></h2><p class="text-lg text-slate-500 mt-1">Chi tiết môn học (9 Kỳ)</p></div>
+              <div id="wiki-list" class="space-y-8 relative border-l-2 border-slate-200 ml-4 pl-8 pb-10"></div>
+          </div>
+      </section>
+
+      <section id="view-guide" class="view-section hidden-view bg-white min-h-screen py-8 overflow-y-auto custom-scrollbar">
+          <div class="max-w-4xl mx-auto px-6">
+              <button onclick="switchView('home')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-green-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại Home</button>
+              <h2 class="text-3xl font-bold text-green-800 mb-4"><i class="fa-solid fa-book-open text-green-600 mr-2"></i> Cẩm Nang Sinh Tồn</h2>
+              <p class="text-slate-600 mb-6">Tổng hợp kỹ năng sống cần thiết cho sinh viên FPTU.</p>
+              
+              <div class="grid gap-8">
+                  <!-- Categories accordion or cards -->
+                  <div class="space-y-4">
+                      <h3 class="text-2xl font-semibold text-slate-800">1. Sinh tồn Tài chính</h3>
+                      <ul class="list-disc list-inside text-slate-600">
+                          <li>Hoạch định ngân sách, tiết kiệm chi tiêu.</li>
+                          <li>Tìm kiếm học bổng, việc làm bán thời gian.</li>
+                          <li>Quản lý thẻ sinh viên, ưu đãi.</li>
+                      </ul>
+                  </div>
+                  <div class="space-y-4">
+                      <h3 class="text-2xl font-semibold text-slate-800">2. Kỹ năng Bếp núc</h3>
+                      <ul class="list-disc list-inside text-slate-600">
+                          <li>Chuẩn bị thực phẩm cơ bản, nấu ăn nhanh.</li>
+                          <li>Vệ sinh an toàn thực phẩm.</li>
+                          <li>Lập kế hoạch bữa ăn tiết kiệm.</li>
+                      </ul>
+                  </div>
+                  <div class="space-y-4">
+                      <h3 class="text-2xl font-semibold text-slate-800">3. Sinh tồn Học thuật</h3>
+                      <ul class="list-disc list-inside text-slate-600">
+                          <li>Lập lịch học, quản lý tài liệu.</li>
+                          <li>Sử dụng thư viện và nguồn học trực tuyến.</li>
+                          <li>Học nhóm và tìm mentor.</li>
+                      </ul>
+                  </div>
+                  <div class="space-y-4">
+                      <h3 class="text-2xl font-semibold text-slate-800">4. Sức khỏe &amp; Tâm lý</h3>
+                      <ul class="list-disc list-inside text-slate-600">
+                          <li>Duy trì thói quen ngủ đủ giấc, ăn uống lành mạnh.</li>
+                          <li>Quản lý stress, tìm hỗ trợ khi cần.</li>
+                          <li>Tham gia hoạt động thể dục, giải trí.</li>
+                      </ul>
+                  </div>
+              </div>
+              
+              <!-- Highlight Cards -->
+              <div class="mt-10 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div class="bg-yellow-50 border border-yellow-200 rounded-2xl p-6 flex flex-col items-center text-center">
+                      <div class="text-4xl">🎒</div>
+                      <h4 class="font-bold text-lg mt-2">Đồ đạc thiết yếu</h4>
+                      <p class="text-sm text-slate-600 mt-1">Balo, sổ tay, nước uống, bộ dụng cụ học tập</p>
+                  </div>
+                  <div class="bg-red-50 border border-red-200 rounded-2xl p-6 flex flex-col items-center text-center">
+                      <div class="text-4xl">🍲</div>
+                      <h4 class="font-bold text-lg mt-2">Lẩu 30k</h4>
+                      <p class="text-sm text-slate-600 mt-1">Món rẻ, đầy đủ dinh dưỡng cho bữa tối sinh viên</p>
+                  </div>
+                  <div class="bg-green-50 border border-green-200 rounded-2xl p-6 flex flex-col items-center text-center">
+                      <div class="text-4xl">💼</div>
+                      <h4 class="font-bold text-lg mt-2">Review bẫy làm thêm</h4>
+                      <p class="text-sm text-slate-600 mt-1">Cảnh báo việc làm thêm trộm cắp, lừa đảo</p>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <section id="view-tool-calc" class="view-section hidden-view bg-white min-h-screen py-8">
+          <div class="max-w-3xl mx-auto px-4">
+              <button onclick="switchView('tools-menu')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+              <div class="bg-green-50 p-8 rounded-[2rem] border border-green-200 shadow-sm">
+                  <h3 class="font-bold text-2xl text-green-800 mb-6">Máy tính điểm Pass</h3>
+                  <div class="space-y-5">
+                      <div><label class="text-sm font-bold text-slate-500">Điểm hiện tại (60% đầu của môn)</label><input type="number" id="calc-total" class="w-full p-4 rounded-2xl border border-slate-300 mt-1 text-lg" placeholder="vd: 6.4"></div>
+                      <button onclick="calculate()" class="w-full bg-green-600 text-white py-4 rounded-2xl font-bold text-lg shadow-md hover:bg-green-700 transition">Tính ngay</button>
+                      <div id="calc-result" class="text-center font-bold text-slate-700 text-xl min-h-[40px] pt-2"></div>
+                      <div id="calc-convert" class="mt-4 text-sm text-slate-600"></div>
+                      <button id="calc-save" onclick="saveCalc()" class="mt-4 w-full bg-white border border-green-600 text-green-600 py-3 rounded-2xl font-bold text-lg hover:bg-green-50 transition">Lưu lịch sử</button>
+                      <div id="calc-history" class="mt-4 max-h-40 overflow-y-auto text-sm text-slate-700"></div>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <section id="view-tool-deadline" class="view-section hidden-view bg-white min-h-screen py-8">
+          <div class="max-w-6xl mx-auto px-4">
+              <button onclick="switchView('tools-menu')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+              
+              <h2 class="text-3xl font-bold text-slate-800 mb-2">Ma trận Eisenhower</h2>
+              <p class="text-slate-600 mb-2">Sắp xếp công việc theo mức độ quan trọng, gấp gáp và hạn chót - Làm điều quan trọng trước</p>
+              <p class="text-xs text-slate-500 mb-8 italic">📣 Nhập hạn chót và cấp quyền thông báo để nhận nhắc nhở đẩy khi deadline sắp đến (3 tiếng và 1 tiếng trước).</p>
+              
+              <!-- Input Section -->
+              <div class="bg-gradient-to-br from-blue-50 to-indigo-50 border border-blue-200 rounded-2xl p-6 mb-8">
+                  <h3 class="font-bold text-lg text-slate-800 mb-4">Thêm công việc</h3>
+                  <div class="space-y-4">
+                      <div>
+                          <label class="block text-sm font-semibold text-slate-700 mb-2">Công việc cần làm:</label>
+                          <input id="task-input-name" type="text" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300" placeholder="VD: Nộp bài tập MAD101" onkeydown="if(event.key==='Enter') addEisenhowerTask()">
+                      </div>
+
+                      <div>
+                          <label class="block text-sm font-semibold text-slate-700 mb-2">Hạn chót:</label>
+                          <input id="task-input-deadline" type="datetime-local" class="w-full px-4 py-3 border border-slate-300 rounded-xl focus:outline-none focus:border-blue-500 focus:ring-1 focus:ring-blue-300" />
+                      </div>
+
+                      <div class="grid grid-cols-2 gap-6">
+                          <!-- Importance -->
+                          <div>
+                              <label class="block text-sm font-semibold text-slate-700 mb-3">Quan trọng?</label>
+                              <div class="flex gap-3">
+                                  <button onclick="setEisenhowerImportance(false)" id="imp-btn-0" class="flex-1 py-2 rounded-lg border-2 border-slate-300 text-slate-700 font-bold transition hover:bg-slate-100">❌ Không</button>
+                                  <button onclick="setEisenhowerImportance(true)" id="imp-btn-1" class="flex-1 py-2 rounded-lg border-2 border-blue-500 bg-blue-100 text-blue-700 font-bold transition">✅ Quan trọng</button>
+                              </div>
+                          </div>
+                          
+                          <!-- Urgency -->
+                          <div>
+                              <label class="block text-sm font-semibold text-slate-700 mb-3">Gấp gáp?</label>
+                              <div class="flex gap-3">
+                                  <button onclick="setEisenhowerUrgency(false)" id="urg-btn-0" class="flex-1 py-2 rounded-lg border-2 border-slate-300 text-slate-700 font-bold transition hover:bg-slate-100">❌ Không</button>
+                                  <button onclick="setEisenhowerUrgency(true)" id="urg-btn-1" class="flex-1 py-2 rounded-lg border-2 border-red-500 bg-red-100 text-red-700 font-bold transition">🔥 Gấp gáp</button>
+                              </div>
+                          </div>
+                      </div>
+                      
+                      <button onclick="addEisenhowerTask()" class="w-full bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold py-3 rounded-xl hover:from-blue-700 hover:to-indigo-700 transition">
+                          <i class="fa-solid fa-plus mr-2"></i> Thêm công việc
+                      </button>
+                  </div>
+              </div>
+              
+              <!-- 4 Quadrants -->
+              <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                  <!-- Q1: Gấp + Quan trọng -->
+                  <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-6 h-96 flex flex-col">
+                      <div class="mb-4 pb-3 border-b-2 border-red-200">
+                          <h3 class="text-lg font-bold text-red-700 flex items-center gap-2">
+                              <span class="text-2xl">🔥</span> 
+                              Gấp & Quan trọng
+                          </h3>
+                          <p class="text-sm text-red-600 font-semibold mt-1">LÀM NGAY</p>
+                      </div>
+                      <div id="quad-1" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar"></div>
+                  </div>
+                  
+                  <!-- Q2: Ko gấp + Quan trọng -->
+                  <div class="bg-blue-50 border-2 border-blue-200 rounded-2xl p-6 h-96 flex flex-col">
+                      <div class="mb-4 pb-3 border-b-2 border-blue-200">
+                          <h3 class="text-lg font-bold text-blue-700 flex items-center gap-2">
+                              <span class="text-2xl">📅</span> 
+                              Quan trọng (Ko gấp)
+                          </h3>
+                          <p class="text-sm text-blue-600 font-semibold mt-1">LÊN LỊCH</p>
+                      </div>
+                      <div id="quad-2" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar"></div>
+                  </div>
+                  
+                  <!-- Q3: Gấp + Ko quan trọng -->
+                  <div class="bg-yellow-50 border-2 border-yellow-200 rounded-2xl p-6 h-96 flex flex-col">
+                      <div class="mb-4 pb-3 border-b-2 border-yellow-200">
+                          <h3 class="text-lg font-bold text-yellow-700 flex items-center gap-2">
+                              <span class="text-2xl">⚡</span> 
+                              Gấp (Ko quan trọng)
+                          </h3>
+                          <p class="text-sm text-yellow-600 font-semibold mt-1">UỶ QUYỀN</p>
+                      </div>
+                      <div id="quad-3" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar"></div>
+                  </div>
+                  
+                  <!-- Q4: Ko gấp + Ko quan trọng -->
+                  <div class="bg-slate-100 border-2 border-slate-300 rounded-2xl p-6 h-96 flex flex-col">
+                      <div class="mb-4 pb-3 border-b-2 border-slate-300">
+                          <h3 class="text-lg font-bold text-slate-700 flex items-center gap-2">
+                              <span class="text-2xl">🗑️</span> 
+                              Không Quan Trọng
+                          </h3>
+                          <p class="text-sm text-slate-600 font-semibold mt-1">XÓA BỎ</p>
+                      </div>
+                      <div id="quad-4" class="flex-1 overflow-y-auto space-y-2 custom-scrollbar"></div>
+                  </div>
+              </div>
+          </div>
+      </section>
+
+      <section id="view-tool-ai-check" class="view-section hidden-view bg-white min-h-screen py-8">
+          <div class="max-w-3xl mx-auto px-4">
+              <button onclick="switchView('tools-menu')" class="mb-6 flex items-center gap-2 text-slate-500 hover:text-orange-600 transition font-bold text-lg"><i class="fa-solid fa-arrow-left"></i> Quay lại</button>
+              <div class="bg-purple-50 p-8 rounded-[2rem] border border-purple-200 shadow-sm">
+                  <h3 class="font-bold text-2xl text-purple-800 mb-4">Check Đạo Văn AI</h3>
+                  <div class="mb-4">
+                      <h4 class="font-semibold text-purple-700 mb-2">Thư viện Prompt mẫu</h4>
+                      <div class="flex flex-wrap gap-2">
+                          <button onclick="document.getElementById('prompt-input').value='Giải thích cho tôi cách hoạt động của vòng lặp for trong JavaScript mà không viết hộ bài tập';" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">Prompt mẫu 1</button>
+                          <button onclick="document.getElementById('prompt-input').value='Cho tôi một chiến lược học hiệu quả môn Cơ sở dữ liệu';" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">Prompt mẫu 2</button>
+                          <button onclick="document.getElementById('prompt-input').value='Hướng dẫn tôi cách trích dẫn ChatGPT theo chuẩn APA';" class="px-3 py-1 bg-purple-100 text-purple-700 rounded-full text-xs">Prompt mẫu 3</button>
+                      </div>
+                  </div>
+                  <textarea id="prompt-input" rows="5" class="w-full p-4 border rounded-2xl outline-none resize-none mb-4 text-base focus:border-purple-400 transition whitespace-pre-wrap break-words" placeholder="Paste đoạn prompt hoặc nội dung cần kiểm tra vào đây..."></textarea>
+                  <div class="mb-4 text-sm text-slate-500">
+                      <p class="font-semibold">Hướng dẫn trích dẫn</p>
+                      <p>✔ APA: "Nguồn: ChatGPT, OpenAI, ngày truy cập"</p>
+                      <p>✔ MLA: "ChatGPT, OpenAI. Truy cập ngày ..."</p>
+                  </div>
+                  <button onclick="checkPrompt()" class="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg hover:bg-purple-700 transition">Kiểm tra ngay</button>
+                  <div id="prompt-res" class="mt-4 text-lg min-h-[30px] text-center whitespace-pre-wrap break-words"></div>
+              </div>
+          </div>
+      </section>
+
+      <section id="view-community" class="view-section hidden-view bg-[#f0f2f5] min-h-screen flex-1 overflow-y-auto custom-scrollbar relative">
+        <div class="max-w-4xl mx-auto pb-20 pt-28 px-4"> 
+            <div class="flex items-center justify-between mb-6">
+                <div class="flex gap-2 p-1 bg-slate-200 rounded-full">
+                    <button onclick="filterFeed('local')" id="tab-local" class="px-6 py-2 rounded-full bg-white text-orange-600 text-sm font-bold shadow-sm transition">Campus của tôi <span class="bg-orange-100 text-orange-600 text-[10px] px-2 py-0.5 rounded-full ml-1" id="local-badge">--</span></button>
+                    <button onclick="filterFeed('global')" id="tab-global" class="px-6 py-2 rounded-full text-slate-600 text-sm font-bold hover:bg-white/50 transition">Toàn quốc (All)</button>
+                </div>
+                <div class="bg-white px-4 py-2 rounded-full border text-xs font-bold text-slate-500 shadow-sm hidden md:block">
+                     <i class="fa-solid fa-location-dot text-red-500 mr-1"></i> <span id="current-campus-display">Đà Nẵng</span>
+                </div>
+            </div>
+
+            <div class="bg-white p-5 mb-6 rounded-3xl shadow-sm border border-slate-200">
+                <div class="flex gap-4">
+                    <div class="w-12 h-12 rounded-full bg-slate-200 text-slate-500 flex items-center justify-center font-bold shrink-0 user-avt-display text-lg">?</div>
+                    <div class="flex-1 bg-slate-100 rounded-full px-6 py-3 cursor-pointer hover:bg-slate-200 transition flex items-center justify-between" onclick="document.getElementById('post-modal').classList.remove('hidden')">
+                        <span class="text-slate-500 font-medium">Bạn đang nghĩ gì?</span><i class="fa-regular fa-image text-slate-400 text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
+            <div id="social-feed" class="space-y-6"></div>
+        </div>
+
+        <button onclick="toggleGroupChat()" class="fixed bottom-24 right-6 bg-indigo-600 text-white p-5 rounded-full shadow-xl z-50 hover:scale-110 transition animate-bounce flex items-center justify-center">
+            <i class="fa-solid fa-comments text-2xl"></i>
+        </button>
+
+        <div id="group-chat-box" class="fixed bottom-0 right-0 w-full md:w-96 h-[500px] bg-white shadow-2xl z-[60] rounded-t-2xl transform translate-y-full transition-transform duration-300 flex flex-col border border-slate-200">
+            <div class="bg-indigo-600 p-4 rounded-t-2xl flex justify-between items-center text-white">
+                <div class="flex items-center gap-3">
+                    <span class="relative flex h-3 w-3"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span><span class="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span></span>
+                    <h4 class="font-bold">Chat: <span id="chat-room-name">...</span></h4>
+                </div>
+                <button onclick="toggleGroupChat()"><i class="fa-solid fa-chevron-down"></i></button>
+            </div>
+            <div id="group-chat-msgs" class="flex-1 overflow-y-auto p-4 space-y-3 bg-slate-50 custom-scrollbar">
+                <div class="text-center text-xs text-slate-400 my-2">-- Bắt đầu cuộc trò chuyện --</div>
+            </div>
+            <div class="p-3 border-t bg-white flex gap-2">
+                <input id="group-chat-input" type="text" class="flex-1 border rounded-full px-4 py-2 text-sm outline-none focus:border-indigo-500" placeholder="Chat gì đó..." onkeydown="if(event.key==='Enter') sendGroupChat()">
+                <button onclick="sendGroupChat()" class="text-indigo-600 hover:text-indigo-800 px-2"><i class="fa-solid fa-paper-plane text-lg"></i></button>
+            </div>
+        </div>
+      </section>
+
+      <section id="view-chat" class="view-section hidden-view flex-1 bg-white flex flex-col h-[calc(100vh-4rem)]">
+         <div class="p-4 border-b flex items-center gap-4 bg-white/80 backdrop-blur">
+             <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white text-sm"><i class="fa-solid fa-sparkles"></i></div>
+             <div><h3 class="font-bold text-slate-800">FPTU Survival AI</h3><p class="text-xs text-green-500 font-bold">● Sẵn sàng hỗ trợ</p></div>
+         </div>
+         
+         <div id="chat-messages" class="flex-1 overflow-y-auto p-6 space-y-6 custom-scrollbar bg-slate-50">
+             <div class="flex gap-4">
+                 <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm"><i class="fa-solid fa-robot"></i></div>
+                 <div class="bg-white border border-slate-200 p-4 rounded-3xl rounded-tl-none text-slate-700 shadow-sm max-w-[85%]">
+                     Chào bạn! Mình là AI "biết tuốt" FPTU. Bạn cần giúp gì không?
+                 </div>
+             </div>
+             
+             <div id="chat-starters" class="flex flex-wrap gap-3 pl-14">
+                 <button onclick="sendChat('Học phí kỳ này bao nhiêu?')" class="chat-chip px-4 py-2 bg-white border rounded-full text-sm hover:bg-slate-50 hover:border-blue-300 transition">💰 Học phí</button>
+                 <button onclick="sendChat('Mất gốc môn C phải làm sao?')" class="chat-chip px-4 py-2 bg-white border rounded-full text-sm hover:bg-slate-50 hover:border-blue-300 transition">😭 Mất gốc Code</button>
+                 <button onclick="sendChat('Review môn MAD101')" class="chat-chip px-4 py-2 bg-white border rounded-full text-sm hover:bg-slate-50 hover:border-blue-300 transition">📚 Review Toán rời rạc</button>
+                 <button onclick="sendChat('Crush lạnh lùng quá')" class="chat-chip px-4 py-2 bg-white border rounded-full text-sm hover:bg-slate-50 hover:border-blue-300 transition">💔 Tư vấn tình cảm</button>
+             </div>
+         </div>
+
+         <div class="p-5 bg-white border-t">
+             <div class="flex gap-3 bg-slate-100 rounded-[2rem] p-2 pl-6 border focus-within:border-blue-400 transition shadow-sm">
+                 <input id="chat-input" class="flex-1 bg-transparent outline-none text-base" placeholder="Nhập tin nhắn..." onkeydown="if(event.key==='Enter') sendChat()">
+                 <button onclick="sendChat()" class="w-10 h-10 rounded-full bg-blue-600 text-white flex items-center justify-center transition hover:bg-blue-700 shadow-md"><i class="fa-solid fa-paper-plane text-sm"></i></button>
+             </div>
+         </div>
+      </section>
+
+  </div>
+
+  <div id="post-modal" class="fixed inset-0 z-[200] bg-black/50 hidden flex items-center justify-center p-4">
+      <div class="bg-white rounded-3xl w-full max-w-lg shadow-2xl animate-[slideUp_0.2s]">
+          <div class="flex justify-between p-5 border-b"><h3 class="font-bold text-lg">Tạo bài viết</h3><button onclick="document.getElementById('post-modal').classList.add('hidden')" class="w-8 h-8 rounded-full hover:bg-slate-100 flex items-center justify-center"><i class="fa-solid fa-xmark"></i></button></div>
+          <div class="p-5">
+              <textarea id="post-content" class="w-full h-32 outline-none resize-none text-lg placeholder-slate-400" placeholder="Bạn đang nghĩ gì thế?"></textarea>
+              <div class="mt-4">
+                  <label class="text-sm font-semibold text-slate-700">Phạm vi</label>
+                  <select id="post-scope" class="w-full p-3 rounded-xl border border-slate-300 mt-1">
+                      <option value="local">Campus của tôi</option>
+                      <option value="global">Toàn quốc</option>
+                  </select>
+              </div>
+              <div class="mt-4">
+                  <label for="post-image" class="w-full border rounded-xl p-3 flex justify-between items-center cursor-pointer hover:bg-slate-50 transition">
+                      <span class="text-slate-500 font-medium">Thêm ảnh vào bài viết</span><i class="fa-solid fa-image text-green-500 text-xl"></i>
+                  </label>
+                  <input type="file" id="post-image" accept="image/*" class="hidden" />
+                  <!-- preview thumbnail shown after user selects a file -->
+                  <div id="post-image-preview-container" class="mt-4 hidden">
+                      <img id="post-image-preview" src="" class="max-h-40 rounded-xl cursor-pointer" alt="Ảnh đã chọn" />
+                  </div>
+              </div>
+          </div>
+          <div class="p-5 pt-0"><button onclick="addPost()" class="w-full bg-orange-600 text-white font-bold py-3 rounded-2xl hover:bg-orange-700 transition shadow-lg shadow-orange-200">Đăng bài</button></div>
+      </div>
+  </div>
+
+  <!-- full screen image viewer overlay -->
+  <div id="image-viewer" class="fixed inset-0 bg-black/70 hidden items-center justify-center z-[300] cursor-pointer">
+      <img src="" class="max-w-full max-h-full rounded" alt="" />
+      <button class="absolute top-4 right-4 text-white text-3xl" onclick="closeImageViewer(event)">&times;</button>
+  </div>
+
+<script>
+  // --- DATA ---
+  const specs = {
+      'IT_FACULTY': [{code:'SE',name:'Kỹ thuật phần mềm (SE)'}, {code:'IA',name:'An toàn thông tin (IA)'}, {code:'AI',name:'Trí tuệ nhân tạo (AI)'}, {code:'IC',name:'Vi mạch (IC)'}, {code:'IoT',name:'Internet vạn vật (IoT)'}],
+      'BIZ_FACULTY': [{code:'IB',name:'Kinh doanh quốc tế (IB)'}, {code:'MKT',name:'Digital Marketing'}, {code:'MC',name:'Truyền thông đa phương tiện'}],
+      'LANG_FACULTY': [{code:'JAP',name:'Ngôn ngữ Nhật'}, {code:'KOR',name:'Ngôn ngữ Hàn'}, {code:'ENG',name:'Ngôn ngữ Anh'}]
+  };
+
+  const curriculumData = {
+      'IC': [ 
+          {name: "Năm 1 - Kỳ 1", subs: [{c:"MAE101",n:"Toán Kỹ thuật",t:"hard",tip:"Đạo hàm, tích phân phải chắc.", diff:5, ref:"#"}, {c:"PHY101",n:"Vật lý 1",t:"medium",tip:"Cơ, Nhiệt.", diff:4, ref:"#"}, {c:"JPD113",n:"Tiếng Nhật sơ cấp",t:"medium",tip:"Học bảng chữ cái ngay.", diff:3, ref:"#"}]},
+
+          {name: "Năm 1 - Kỳ 2", subs: [{c:"PRF192",n:"Lập trình C",t:"hard",tip:"Con trỏ là ác mộng."}, {c:"CEA201",n:"Kiến trúc máy tính",t:"medium",tip:"CPU, Memory."}, {c:"PHY102",n:"Vật lý 2",t:"hard",tip:"Điện từ trường."}]},
+          {name: "Năm 2 - Kỳ 3", subs: [{c:"EE101",n:"Mạch điện",t:"hard",tip:"Định luật Ohm."}, {c:"DLD101",n:"Thiết kế số",t:"medium",tip:"Logic Gates."}]},
+          {name: "Năm 2 - Kỳ 4", subs: [{c:"ECD201",n:"Mạch điện tử",t:"hard",tip:"Transistor, MOSFET."}, {c:"SSG104",n:"Tín hiệu hệ thống",t:"hard",tip:"Fourier."}]},
+          {name: "Năm 3 - Kỳ 5", subs: [{c:"ICD301",n:"IC Design Layout",t:"hard",tip:"Vẽ Layout chip."}, {c:"VER202",n:"Verilog HDL",t:"medium",tip:"Code phần cứng."}]},
+          {name: "Năm 3 - Kỳ 6", subs: [{c:"DIC302",n:"Digital IC Design",t:"hard",tip:"Timing analysis."}, {c:"AIC303",n:"Analog IC Design",t:"hard",tip:"Siêu khó."}]},
+          {name: "Năm 4 - Kỳ 7", subs: [{c:"OJT",n:"Thực tập",t:"easy",tip:"Đi làm doanh nghiệp."}]},
+          {name: "Năm 4 - Kỳ 8 & 9", subs: [{c:"CAPSTONE",n:"Đồ án tốt nghiệp",t:"hard",tip:"Làm chip thực tế."}]}
+      ],
+      'SE': [
+          {name: "Kỳ 1 (Nền tảng)", subs:[{c:"PRF192",n:"C Programming",t:"hard",tip:"Học kỹ Pointer.", diff:4, ref:"#"},{c:"MAD101",n:"Toán rời rạc",t:"hard",tip:"Logic, Graph.", diff:5, ref:"#"}]},
+          {name: "Kỳ 3 (Chuyên ngành)", subs:[{c:"CSD201",n:"Data Structures",t:"hard",tip:"Thuật toán."},{c:"DBI202",n:"Database",t:"medium",tip:"SQL Server."}]}
+      ]
+  };
+
+  // list of generic avatars (cartoon faces) users can be randomly assigned
+  const avatarList = [
+      "https://i.pravatar.cc/150?img=5",
+      "https://i.pravatar.cc/150?img=8",
+      "https://i.pravatar.cc/150?img=12",
+      "https://i.pravatar.cc/150?img=15",
+      "https://i.pravatar.cc/150?img=20"
+  ];
+
+  let posts = [
+      { id: 1, user: "Minh Tuấn", avt: "https://i.pravatar.cc/150?img=5", campus: "Đà Nẵng", content: "Review Cơm tấm 35k cổng sau Đà Nẵng: Sườn to, cơm nhiều. 9/10 nhé ae!", img: "https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500", likes: 12, cmts: [{u:"Nam",t:"Xin địa chỉ bác ơi"}] },
+      { id: 2, user: "Confession HN", avt: "https://i.pravatar.cc/150?img=8", campus: "Hà Nội", content: "Có ai nhặt được thẻ xe ở nhà xe Beta Hoà Lạc không ạ? Cho em xin chuộc 😭", img: "", likes: 5, cmts: [] },
+      { id: 3, user: "Hải Yến", avt: "https://i.pravatar.cc/150?img=12", campus: "HCM", content: "Quận 9 chiều nay mưa to, các bạn đi học nhớ mang áo mưa nhé!", img: "", likes: 24, cmts: [] },
+      { id: 4, user: "Bảo Ngọc", avt: "https://i.pravatar.cc/150?img=15", campus: "Quy Nhơn", content: "AI Valley Quy Nhơn đẹp thật sự các bác ạ 😍", img: "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500", likes: 45, cmts: [] },
+      { id: 5, user: "Thành Đạt", avt: "https://i.pravatar.cc/150?img=20", campus: "Cần Thơ", content: "Cần tìm team đá bóng sân FPT Cần Thơ chiều nay. Thiếu 1 thủ môn.", img: "", likes: 2, cmts: [] },
+      { id: 6, user: "Linh Đan", avt: "https://i.pravatar.cc/150?img=25", campus: "Đà Nẵng", content: "Có ai biết review trung tâm photocopy ở gần KTX B không? Cần photocopy bài tập thôi.", img: "", likes: 8, cmts: [{u:"Mai",t:"Có tiệm ở chợ Hàn đủ tiện"}] },
+      { id: 7, user: "Khánh Phương", avt: "https://i.pravatar.cc/150?img=30", campus: "Hà Nội", content: "Sáng nay thi PRF192, mấy bạn làm bài bao lâu? Đề mình thấy khó qua 🥺", img: "", likes: 19, cmts: [{u:"Tú",t:"Đề này dễ hơn lần trước mà"},{u:"Phát",t:"Mình 45 phút xong"}] },
+      { id: 8, user: "Tuấn Anh", avt: "T", campus: "HCM", content: "Alert: Thẻ xe chiều nay bị hư, các bạn nhớ có thẻ dự phòng hoặc có tiền lẻ để mua vé tạm thời 🚗", img: "", likes: 34, cmts: [] },
+      { id: 9, user: "Minh Thu", avt: "https://i.pravatar.cc/150?img=22", campus: "Quy Nhơn", content: "Lần đầu tiên thấy bình minh ở cầu cảng Quy Nhơn 🌅 Đẹp quá, ai cũng phải đi xem lần nữa ạ!", img: "https://images.unsplash.com/photo-1495888714795-8a5f62e5a6f4?w=500", likes: 78, cmts: [{u:"Như",t:"Háng, phải đi chiều nay"}] },
+      { id: 10, user: "Hoàng Nam", avt: "https://i.pravatar.cc/150?img=18", campus: "Cần Thơ", content: "Ai có group chat môn MAD101 không? Muốn gia nhập để hỏi bài chập chứng 😅", img: "", likes: 11, cmts: [{u:"Duyên",t:"Có, tao mời link"}] },
+      { id: 11, user: "Thanh Hương", avt: "https://i.pravatar.cc/150?img=23", campus: "Đà Nẵng", content: "Mấy bạn có sử dụng Notion để quản lý task không? Chia sẻ template với mình cái nha 📝", img: "", likes: 15, cmts: [] },
+      { id: 12, user: "Quốc Huy", avt: "Q", campus: "Hà Nội", content: "Recruitment: Cần 2 backend developer cho startup. PM mình nếu quan tâm! Mức lương từ 8-12tr/tháng.", img: "", likes: 42, cmts: [{u:"Sơn",t:"Gửi CV rồi"},] },
+      { id: 13, user: "Bích Ngân", avt: "https://i.pravatar.cc/150?img=27", campus: "HCM", content: "Chuyên ngành gì của FPT khó nhất? Nghe nói VLSI sát thương lắm 😨", img: "", likes: 56, cmts: [{u:"Hướng",t:"VLSI khó nhưng thích hợp với những ai yêu thích thiết kế"},{u:"Long",t:"IC Design cũng không thua kém"}] },
+      { id: 14, user: "An Khôi", avt: "https://i.pravatar.cc/150?img=35", campus: "Quy Nhơn", content: "Hôm nay free, có ai muốn đi chơi ở Tây Nguyên không? 🏔️", img: "", likes: 7, cmts: [] },
+      { id: 15, user: "Minh Vũ", avt: "https://i.pravatar.cc/150?img=28", campus: "Cần Thơ", content: "Ai biết cách nộp hỗ trợ khoảng 2 triệu cho sinh viên khó khăn? Vừa mới biết có chương trình này 🤔", img: "", likes: 22, cmts: [{u:"Phi",t:"Lên phòng học sinh phòng làm việc đó là có danh sách"}] },
+      { id: 16, user: "Đức Trung", avt: "https://i.pravatar.cc/150?img=33", campus: "Đà Nẵng", content: "Setup workspace tại KTX xong! Dân lập trình mà home office không có monitor thì toán 🖥️😅", img: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500", likes: 91, cmts: [{u:"Linh",t:"Workspace đẹp thiệt"}] },
+      { id: 17, user: "FPTU Careers", avt: "https://i.pravatar.cc/150?img=40", campus: "All", scope: "global", content: "🎉 Tuyên bố: Hơn 500 sinh viên FPT được nhận việc làm sau tốt nghiệp kỳ này! Chúc mừng các bạn! #fpt #career #hiring", img: "", likes: 234, cmts: [{u:"Minh",t:"Tuyệt vời!"},{u:"Hân",t:"Mik cũng nằm trong con số đó ^^"}] },
+      { id: 18, user: "Tech Hub Vietnam", avt: "https://i.pravatar.cc/150?img=41", campus: "All", scope: "global", content: "Khóa học miễn phí: 'Mastering AI & Machine Learning' bắt đầu tuần tới! Dành cho toàn bộ sinh viên FPT. Link đăng ký: fptu.edu.vn/ai-course", img: "", likes: 156, cmts: [{u:"Phương",t:"Vừa đăng ký rồi"}] },
+      { id: 19, user: "FPT Scholarship", avt: "https://i.pravatar.cc/150?img=42", campus: "All", scope: "global", content: "Học bổng Toàn phần 2 năm cho sinh viên xuất sắc kỳ này. Hạn nộp: 28/2/2026. Yêu cầu: GPA ≥ 3.5, tham gia 2 hoạt động ngoại khóa.", img: "", likes: 89, cmts: [{u:"Dung",t:"Sắp hết hạn rồi, mau nộp"}] },
+      { id: 20, user: "FPT Sports Club", avt: "https://i.pravatar.cc/150?img=43", campus: "All", scope: "global", content: "⚽ Giải bóng đá nội bộ FPT 2026 - Bắt đầu đăng ký! Các đội từ 5 cơ sở được phép tham gia. Giải nhất: 20 triệu VND 🏆", img: "", likes: 127, cmts: [{u:"Tuấn",t:"Đợi đội mình đăng ký"},{u:"Hòa",t:"Năm nay mình sẽ vô địch!"}] },
+      { id: 21, user: "FPT Life Magazine", avt: "https://i.pravatar.cc/150?img=44", campus: "All", scope: "global", content: "📚 Bài viết: 'Cân bằng cuộc sống sinh viên công nghệ' - Lời khuyên từ các mentor FPT. Đọc đầy đủ trên blog FPT!", img: "", likes: 203, cmts: [{u:"Linh",t:"Useful tips!"},{u:"An",t:"Sẽ áp dụng ngay"}] },
+      { id: 22, user: "FPT Community Events", avt: "https://i.pravatar.cc/150?img=45", campus: "All", scope: "global", content: "🎪 Tháng 3: Festival công nghệ toàn FPT - Hackathon, workshop, networking. Các bạn sắp sẵn sàng chưa? 💻", img: "", likes: 178, cmts: [{u:"Sơn",t:"Excited!"}] },
+      { id: 23, user: "Internship Hub", avt: "https://i.pravatar.cc/150?img=46", campus: "All", scope: "global", content: "💼 Cơ hội internship: Google, Microsoft, Samsung mở đơn tuyển ứng viên từ FPT. Hạn chế chỗ, apply ASAP! 🚀", img: "", likes: 312, cmts: [{u:"Phát",t:"Vừa submit application"},{u:"Hương",t:"Chúc mừng bạn!"}] },
+      { id: 24, user: "Mental Health Support", avt: "https://i.pravatar.cc/150?img=47", campus: "All", scope: "global", content: "🧠 Tâm lý học viên: Thi cử, áp lực tiền bạc, mối quan hệ... Hãy tìm đến phòng Đoàn-Hội để được tư vấn miễn phí! Luôn sẵn sàng lắng nghe. 💙", img: "", likes: 256, cmts: [{u:"Mai",t:"Cảm ơn FPT đã quan tâm"},] },
+      { id: 25, user: "FPT Alumni Success", avt: "https://i.pravatar.cc/150?img=48", campus: "All", scope: "global", content: "🌟 Nhân vật tuần: Nguyễn Minh Phát - Cựu sinh viên FPT, hiện CTO tại Startup Unicorn Việt Nam. Đọc câu chuyện truyền cảm hứng của anh ấy!", img: "", likes: 445, cmts: [{u:"Tú",t:"Mục tiêu của tui"},{u:"Huyền",t:"Amazing!"}] }
+  ];
+
+  let currentUser = { name: "", campus: "", faculty: "" }; 
+
+// ---- UNDO/REDO HISTORY ----
+let historyStack = [];
+let historyIndex = -1;
+let currentFeedType = 'local';
+
+function saveHistory(){
+    const snapshot = {
+        posts: JSON.parse(JSON.stringify(posts)),
+        eisenhowerTasks: JSON.parse(JSON.stringify(eisenhowerTasks))
+    };
+    historyStack = historyStack.slice(0, historyIndex+1);
+    historyStack.push(snapshot);
+    historyIndex++;
+}
+
+function applyHistory(snapshot){
+    posts = JSON.parse(JSON.stringify(snapshot.posts));
+    eisenhowerTasks = JSON.parse(JSON.stringify(snapshot.eisenhowerTasks));
+    renderEisenhowerMatrix();
+    filterFeed(currentFeedType);
+}
+
+function undo(){
+    if(historyIndex > 0){
+        historyIndex--;
+        applyHistory(historyStack[historyIndex]);
+    }
+}
+function redo(){
+    if(historyIndex < historyStack.length - 1){
+        historyIndex++;
+        applyHistory(historyStack[historyIndex]);
+    }
+}
+
+document.addEventListener('keydown', e=>{
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){
+        e.preventDefault(); undo();
+    }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='y'){
+        e.preventDefault(); redo();
+    }
+});
+
+  // --- CORE FUNCTIONS (QUAN TRỌNG ĐỂ ĐĂNG NHẬP) ---
+  function handleLogin() {
+      const name = document.getElementById('fullname').value.trim();
+      const mssv = document.getElementById('mssv').value.trim();
+      if(name && mssv) {
+          currentUser.name = name; 
+          currentUser.campus = document.getElementById('campus').value; 
+          currentUser.faculty = document.getElementById('faculty').value;
+          // assign random avatar image
+          currentUser.avatar = avatarList[Math.floor(Math.random()*avatarList.length)];
+          
+          document.getElementById('welcome-name').innerText = name;
+          document.getElementById('welcome-campus').innerText = currentUser.campus;
+          // Cập nhật tên trên header
+          const headerName = document.getElementById('header-username');
+          if(headerName) headerName.innerText = name;
+
+          document.getElementById('welcome-faculty').innerText = document.getElementById('faculty').options[document.getElementById('faculty').selectedIndex].text;
+
+          // update avatar displays (header + any user-avt-display elements)
+          const setAvatarElem = e => {
+              if(currentUser.avatar) {
+                  e.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full rounded-full object-cover">`;
+              } else {
+                  e.innerText = name.charAt(0).toUpperCase();
+              }
+          };
+          document.querySelectorAll('.user-avt-display').forEach(setAvatarElem);
+          const headerAvt = document.getElementById('user-avatar');
+          if(headerAvt) setAvatarElem(headerAvt);
+          
+          const localBadge = document.getElementById('local-badge');
+          if(localBadge) localBadge.innerText = currentUser.campus.substring(0,2).toUpperCase();
+          
+          const campusDisplay = document.getElementById('current-campus-display');
+          if(campusDisplay) campusDisplay.innerText = currentUser.campus;
+
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('main-app').classList.remove('hidden');
+          document.getElementById('main-app').classList.add('flex');
+          
+          switchView('home');
+          filterFeed('local');
+          // capture initial state
+          saveHistory();
+      } else { alert("Vui lòng điền đủ Tên và MSSV!"); }
+  }
+
+  // --- NAVIGATION ---
+  function switchView(id) {
+      document.querySelectorAll('.view-section').forEach(e => {
+          e.classList.add('hidden-view'); e.classList.remove('active-view');
+      });
+      document.getElementById('view-' + id).classList.remove('hidden-view');
+      document.getElementById('view-' + id).classList.add('active-view');
+      
+      document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-orange-600', 'bg-white', 'shadow-sm'));
+      const btn = document.getElementById('btn-' + (id==='home'?'home':id));
+      if(btn) btn.classList.add('text-orange-600', 'bg-white', 'shadow-sm');
+  }
+
+  // --- BACK BUTTON ---
+  function handleBackButton() {
+      const views = ['home', 'community', 'tools-menu', 'chat', 'guide', 'wiki-select', 'wiki-roadmap', 'social'];
+      const currentView = views.find(v => !document.getElementById(v)?.classList.contains('hidden-view'));
+      
+      if(currentView === 'home') {
+          document.getElementById('main-app').classList.add('hidden');
+          document.getElementById('login-screen').classList.remove('hidden');
+      } else if(currentView === 'wiki-roadmap') {
+          switchView('wiki-select');
+      } else if(currentView === 'wiki-select' || currentView === 'social') {
+          switchView('community');
+      } else {
+          switchView('home');
+      }
+  }
+
+  // --- WIKI FLOW ---
+  function openWikiSelection() {
+      const list = document.getElementById('wiki-spec-list'); list.innerHTML = "";
+      const options = specs[currentUser.faculty] || specs['IT_FACULTY'];
+      document.getElementById('wiki-faculty-name').innerText = document.getElementById('welcome-faculty').innerText;
+      
+      options.forEach(opt => {
+          list.innerHTML += `<div onclick="openWikiRoadmap('${opt.code}', '${opt.name}')" class="bg-white p-6 rounded-2xl border border-slate-200 cursor-pointer hover:border-orange-400 hover:shadow-md transition flex justify-between items-center group"><span class="font-bold text-slate-700 text-lg group-hover:text-orange-600">${opt.name}</span><i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-orange-600 text-xl"></i></div>`;
+      });
+      switchView('wiki-select');
+  }
+
+  function openWikiRoadmap(code, name) {
+      const container = document.getElementById('wiki-list');
+      const data = curriculumData[code] || curriculumData['SE']; 
+      document.getElementById('roadmap-title').innerText = name;
+      container.innerHTML = "";
+      
+      // roadmap overview
+      container.innerHTML += `<div class="mb-6">
+          <h3 class="font-bold text-lg text-slate-800">Lộ trình học tập</h3>
+          <ul class="list-disc list-inside text-slate-600">
+              <li><b>Kinh tế:</b> Đại cương → Cơ sở ngành (Kinh tế vi mô/vĩ mô) → Chuyên ngành sâu (Tài chính doanh nghiệp, Marketing quốc tế).</li>
+              <li><b>Công nghệ:</b> Lập trình căn bản (C/C++, Python) → Cấu trúc dữ liệu & Giải thuật → Chuyên sâu (Web, Mobile, AI).</li>
+          </ul>
+      </div>`;
+      
+      data.forEach(sem => {
+          let html = `<div class="relative"><div class="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-orange-500 border-4 border-white shadow-md"></div><h4 class="font-bold text-slate-800 mb-4 text-base uppercase tracking-wider">${sem.name}</h4><div class="grid md:grid-cols-2 gap-4 mb-10">`;
+          sem.subs.forEach(sub => {
+              const diffStars = sub.diff ? '★'.repeat(sub.diff) + '☆'.repeat(5-sub.diff) : '';
+              const refLink = sub.ref ? `<a href="${sub.ref}" target="_blank" class="text-xs text-blue-600 underline ml-2">Tài liệu</a>` : '';
+              html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 hover:border-orange-300 transition cursor-pointer group hover:bg-white hover:shadow-sm"><div class="flex justify-between items-start"><div><h4 class="font-bold text-slate-800 text-base group-hover:text-orange-600">${sub.c} - ${sub.n}</h4><p class="text-xs text-yellow-600 mt-1">${diffStars}</p><p class="text-sm text-slate-500 mt-1 leading-snug">${sub.tip}</p>${refLink}</div><span class="tag-${sub.t}">${sub.t.toUpperCase()}</span></div></div>`;
+          });
+          container.innerHTML += html + "</div></div>";
+      });
+      switchView('wiki-roadmap');
+  }
+
+  // --- SOCIAL ---
+  function filterFeed(type) {
+      currentFeedType = type;
+      const container = document.getElementById('social-feed');
+      container.innerHTML = "";
+      
+      const btnLocal = document.getElementById('tab-local');
+      const btnGlobal = document.getElementById('tab-global');
+      const chatName = document.getElementById('chat-room-name');
+
+      if(type==='local'){
+          btnLocal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
+          btnGlobal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
+          if(chatName) chatName.innerText = currentUser.campus; 
+      } else {
+          btnLocal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
+          btnGlobal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
+          if(chatName) chatName.innerText = "Toàn quốc (5 Miền)";
+      }
+
+      const filtered = posts.filter(p => {
+          const scope = p.scope || 'local'; // default older posts to local
+          if(type === 'global') return scope === 'global';
+          // local feed: only posts scoped local and matching campus
+          return scope === 'local' && p.campus === currentUser.campus;
+      });
+      
+      filtered.forEach(p => {
+          let imgHtml = p.img ? `<img src="${p.img}" onclick="viewImage(this.src)" class="w-full h-auto max-h-[500px] object-cover rounded-2xl mt-4 mb-2 border border-slate-100 cursor-pointer">` : "";
+          let commentsHtml = p.cmts.map(c => `<div class="bg-slate-100 p-3 rounded-2xl text-sm mt-2 break-words"><b>${c.u}:</b> ${c.t}</div>`).join('');
+          let badge = type==='global' ? `<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full ml-2 border">${p.campus}</span>` : "";
+
+          const div = document.createElement('div');
+          div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 animate-[slideUp_0.3s]";
+          // build avatar html
+          let avatarHtml;
+          if(p.avt && (p.avt.startsWith('http') || p.avt.startsWith('data:'))){
+              avatarHtml = `<img src="${p.avt}" class="w-12 h-12 rounded-full object-cover shrink-0">`;
+          } else {
+              avatarHtml = `<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-lg">${p.avt || ''}</div>`;
+          }
+          div.innerHTML = `
+            <div class="flex gap-4 mb-3">${avatarHtml}<div><h5 class="font-bold text-base text-slate-900 flex items-center">${p.user} ${badge}</h5><p class="text-xs text-slate-400">Vừa xong</p></div></div>
+            <p class="text-base text-slate-800 leading-relaxed break-words">${p.content}</p>${imgHtml}
+            <div class="flex gap-8 mt-4 pt-4 border-t border-slate-50 text-sm font-bold text-slate-500">
+                <button onclick="likePost(${p.id}, this)" class="hover:text-red-500 flex items-center gap-2 transition"><i class="fa-regular fa-heart text-xl"></i> <span id="like-count-${p.id}">${p.likes}</span></button>
+                <button onclick="toggleComment(${p.id})" class="hover:text-blue-500 flex items-center gap-2 transition"><i class="fa-regular fa-comment text-xl"></i> Bình luận</button>
+            </div>
+            <div id="cmt-box-${p.id}" class="hidden mt-4 pt-2 border-t border-slate-50">
+                <div id="cmt-list-${p.id}" class="space-y-2 mb-3">${commentsHtml}</div>
+                <div class="flex gap-3"><input id="cmt-input-${p.id}" class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-300 transition" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter') addComment(${p.id})"><button onclick="addComment(${p.id})" class="text-blue-600 font-bold text-sm px-3 hover:bg-blue-50 rounded-full">Gửi</button></div>
+            </div>`;
+          container.appendChild(div);
+      });
+  }
+
+  function likePost(id, btn) {
+      const p = posts.find(x => x.id === id);
+      const icon = btn.querySelector('i');
+      const span = btn.querySelector('span');
+      if (icon.classList.contains('fa-regular')) { icon.classList.replace('fa-regular', 'fa-solid'); btn.classList.add('text-red-500'); p.likes++; } 
+      else { icon.classList.replace('fa-solid', 'fa-regular'); btn.classList.remove('text-red-500'); p.likes--; }
+      span.innerText = p.likes;
+      saveHistory();
+  }
+  function toggleComment(id) { document.getElementById(`cmt-box-${id}`).classList.toggle('hidden'); }
+  function addComment(id) {
+      const input = document.getElementById(`cmt-input-${id}`);
+      const text = input.value.trim();
+      if (!text) return;
+      const p = posts.find(x => x.id === id);
+      p.cmts.push({u: currentUser.name, t: text});
+      const list = document.getElementById(`cmt-list-${id}`);
+      const newCmt = document.createElement('div');
+      newCmt.className = "bg-slate-100 p-3 rounded-2xl text-sm mt-2 animate-[slideUp_0.2s] break-words";
+      newCmt.innerHTML = `<b>${currentUser.name}:</b> ${text}`;
+      list.appendChild(newCmt);
+      input.value = "";
+      saveHistory();
+  }
+  function addPost() {
+      const txt = document.getElementById('post-content').value.trim();
+      const scope = document.getElementById('post-scope').value || 'local';
+      if(!txt) return;
+      // read image if selected
+      const fileInput = document.getElementById('post-image');
+      let imgUrl = "";
+      const doPush = () => pushPost(txt, imgUrl, scope);
+      if(fileInput && fileInput.files && fileInput.files[0]) {
+          const file = fileInput.files[0];
+          const reader = new FileReader();
+          reader.onload = function(e) {
+              imgUrl = e.target.result;
+              doPush();
+          };
+          reader.readAsDataURL(file);
+      } else {
+          doPush();
+      }
+  }
+
+  // show preview on file selection inside modal
+  document.getElementById('post-image').addEventListener('change', function(){
+      if(this.files && this.files[0]){
+          const reader = new FileReader();
+          reader.onload = e => {
+              const preview = document.getElementById('post-image-preview');
+              preview.src = e.target.result;
+              document.getElementById('post-image-preview-container').classList.remove('hidden');
+          };
+          reader.readAsDataURL(this.files[0]);
+      } else {
+          const preview = document.getElementById('post-image-preview');
+          preview.src = '';
+          document.getElementById('post-image-preview-container').classList.add('hidden');
+      }
+  });
+  document.getElementById('post-image-preview').addEventListener('click', function(){
+      if(this.src) viewImage(this.src);
+  });
+
+  function viewImage(url){
+      const iv=document.getElementById('image-viewer');
+      iv.querySelector('img').src=url;
+      iv.classList.remove('hidden');
+  }
+  function closeImageViewer(e){
+      e.stopPropagation();
+      const iv=document.getElementById('image-viewer');
+      iv.classList.add('hidden');
+      iv.querySelector('img').src='';
+  }
+  // clicking outside the image (on overlay) also closes
+  document.getElementById('image-viewer').addEventListener('click', closeImageViewer);
+  function pushPost(txt, imgUrl, scope='local') {
+      const avatarValue = currentUser.avatar || currentUser.name.charAt(0).toUpperCase();
+      const campus = scope === 'global' ? 'All' : currentUser.campus;
+      posts.unshift({id:Date.now(), user:currentUser.name, avt:avatarValue, campus, scope, content:txt, img:imgUrl, likes:0, cmts:[]});
+      document.getElementById('post-content').value = "";
+      if(document.getElementById('post-image')) {
+          document.getElementById('post-image').value = "";
+          // hide preview thumbnail when resetting
+          const previewCont = document.getElementById('post-image-preview-container');
+          if(previewCont) previewCont.classList.add('hidden');
+          const previewImg = document.getElementById('post-image-preview');
+          if(previewImg) previewImg.src = "";
+      }
+      if(document.getElementById('post-scope')) document.getElementById('post-scope').value = 'local';
+      document.getElementById('post-modal').classList.add('hidden');
+      // refresh feed based on scope selected
+      if(scope === 'global') filterFeed('global'); else filterFeed('local');
+  }
+
+  // --- CALC & CHECK ---
+  function toggleModal(id) { document.getElementById('modal-' + id).classList.toggle('hidden'); }
+  
+  function calculate(){
+      const current = parseFloat(document.getElementById('calc-total').value);
+      const r = document.getElementById('calc-result');
+      const conv = document.getElementById('calc-convert');
+      // validate
+      if(isNaN(current) || current < 0 || current > 10){
+          r.innerHTML = `<span class="text-red-600 font-bold">Điểm quá trình không hợp lệ! (0-10)</span>`;
+          conv.innerHTML = '';
+          return;
+      }
+
+      // formula: (current + final) / 2 >=5  => final = 10 - current
+      const finalNeeded = 10 - current;
+      let message = '';
+      if(finalNeeded > 10){
+          message = `<span class="text-red-600 font-bold">Toang rồi, học lại thôi 😭</span>`;
+      } else if(finalNeeded <= 0){
+          message = `<span class="text-green-600 font-bold">Điểm quá trình cao, 0 điểm thi vẫn pass nhưng cố kiếm điểm cao nhé!</span>`;
+      } else {
+          message = `Cần thi Final ít nhất: <b>${finalNeeded.toFixed(1)}</b> điểm`;
+      }
+      r.innerHTML = message;
+
+      // keep conversion table for reference
+      conv.innerHTML = `
+          <table class="w-full text-sm">
+              <tr><th class="text-left">Điểm 10</th><th>Hệ 4</th><th>Chữ</th></tr>
+              <tr><td>9-10</td><td>4.0</td><td>A</td></tr>
+              <tr><td>8-8.9</td><td>3.5</td><td>B</td></tr>
+              <tr><td>6.5-7.9</td><td>2.0</td><td>C</td></tr>
+              <tr><td>5-6.4</td><td>1.0</td><td>D</td></tr>
+              <tr><td><5</td><td>0.0</td><td>F</td></tr>
+          </table>`;
+  }
+
+  function saveCalc(){
+      const total = document.getElementById('calc-total').value;
+      const history = JSON.parse(localStorage.getItem('calc_history')||'[]');
+      history.unshift({total,date:new Date().toLocaleString()});
+      localStorage.setItem('calc_history', JSON.stringify(history));
+      renderCalcHistory();
+  }
+  
+  function renderCalcHistory(){
+      const histDiv = document.getElementById('calc-history');
+      const history = JSON.parse(localStorage.getItem('calc_history')||'[]');
+      histDiv.innerHTML = history.map(h=>`<div class="border-b py-1 text-xs">${h.date}: ${h.total}</div>`).join('');
+  }
+  
+  
+  // persistence and notifications for deadlines
+  function saveEisenhowerTasks(){
+      localStorage.setItem('eisenhowerTasks', JSON.stringify(eisenhowerTasks));
+  }
+  function loadEisenhowerTasks(){
+      eisenhowerTasks = JSON.parse(localStorage.getItem('eisenhowerTasks')||'[]');
+  }
+  function requestNotificationPermission(){
+      if("Notification" in window && Notification.permission !== 'granted'){
+          Notification.requestPermission();
+      }
+  }
+  function checkDeadlines(){
+      if(!("Notification" in window) || Notification.permission !== 'granted') return;
+      const now = Date.now();
+      eisenhowerTasks.forEach(task=>{
+          if(task.due){
+              const diff = task.due - now;
+              if(diff <= 3*3600*1000 && !task.notified3h){
+                  new Notification(`🔔 Deadline sắp tới: ${task.name} còn 3 giờ`);
+                  task.notified3h = true;
+                  saveEisenhowerTasks();
+              }
+              if(diff <= 1*3600*1000 && !task.notified1h){
+                  new Notification(`🔔 Deadline sắp tới: ${task.name} còn 1 giờ`);
+                  task.notified1h = true;
+                  saveEisenhowerTasks();
+              }
+          }
+      });
+  }
+  window.addEventListener('load',()=>{ 
+      renderCalcHistory(); 
+      loadEisenhowerTasks();
+      renderEisenhowerMatrix();
+      requestNotificationPermission();
+      checkDeadlines();
+      setInterval(checkDeadlines, 60000);
+  });
+  
+  async function checkPrompt(){
+      const v = document.getElementById('prompt-input').value.trim();
+      const r = document.getElementById('prompt-res');
+      if(!v) return;
+      // loading animation text
+      r.innerHTML = `<span class="text-slate-400"><i class='fa-solid fa-spinner fa-spin'></i> Đang phân tích và tối ưu prompt...</span>`;
+
+      try {
+          const API_KEY = "AIzaSyDLN92oNAfjxPBGYa6FAfraJauaPvE_Zl8";
+          if (!API_KEY || API_KEY === "YOUR_CHECK_PROMPT_API_KEY_HERE") {
+              document.getElementById('prompt-res').innerHTML = `<span class="text-red-600 font-bold">⚠️ API key chưa được cấu hình trong file check-prompt.ts</span>`;
+              return;
+          }
+          const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+
+          const context = `Bạn là một chuyên gia Prompt Engineering cấp cao. Nhiệm vụ của bạn là đánh giá và tối ưu hóa câu lệnh (prompt) mà người dùng nhập vào.\nDưới đây là câu lệnh của người dùng: ${v}.\nHãy trả lời bằng mã HTML (không dùng markdown) với cấu trúc 2 phần rõ ràng:\n\nPhần 1: <b>💡 Đánh giá nhanh:</b> Đánh giá điểm mạnh, điểm yếu của prompt này (VD: thiếu ngữ cảnh, thiếu vai trò...). Trả lời thật ngắn gọn.\n\nPhần 2: <b>✨ Prompt tối ưu:</b> Viết lại một prompt hoàn chỉnh, chuyên nghiệp nhất dựa trên ý định của người dùng, áp dụng các kỹ thuật như đặt vai trò (Act as...), cung cấp context, và yêu cầu format rõ ràng.`;
+
+          const response = await fetch(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+          });
+
+          const data = await response.json();
+          if (!response.ok) throw new Error(data.error?.message || 'Lỗi API');
+
+          if (data.candidates && data.candidates[0].content) {
+              const reply = data.candidates[0].content.parts[0].text;
+              // Dùng markdown formatter để hiển thị đẹp
+              const formattedReply = window.formatMarkdownToHTML ? 
+                  window.formatMarkdownToHTML(reply) : 
+                  reply.replace(/\n/g, '<br>');
+              
+              r.innerHTML = formattedReply;
+          } else {
+              r.innerHTML = `<span class="text-red-600">Không nhận được phản hồi hợp lệ từ AI.</span>`;
+          }
+      } catch (err) {
+          console.error(err);
+          r.innerHTML = `<span class="text-red-600 font-bold"><i class='fa-solid fa-triangle-exclamation'></i> Lỗi: ${err.message || 'Mất mạng hoặc API'}</span>`;
+      }
+  }
+
+ // --- CHATBOT ---
+  async function sendChat(optionalText = null) {
+      const inp = document.getElementById('chat-input');
+      const text = optionalText || inp.value.trim();
+      if (!text) return;
+
+      const starters = document.getElementById('chat-starters');
+      if (starters) starters.style.display = 'none';
+      const box = document.getElementById('chat-messages');
+      // User Message
+      box.innerHTML += `<div class="flex gap-4 flex-row-reverse animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-orange-600 text-white flex items-center justify-center shrink-0 text-sm"><i class="fa-solid fa-user"></i></div><div class="bg-orange-600 text-white p-4 rounded-3xl rounded-tr-none shadow text-base max-w-[85%] break-words">${text}</div></div>`;
+      inp.value = "";
+      box.scrollTop = box.scrollHeight;
+
+      // Loading
+      const typingId = "typing-" + Date.now();
+      const typingDiv = document.createElement('div');
+      typingDiv.id = typingId;
+      typingDiv.className = "flex gap-4 mt-2";
+      typingDiv.innerHTML = `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm"><i class="fa-solid fa-robot"></i></div><div class="bg-white border p-4 rounded-3xl rounded-tl-none text-sm typing-indicator"><span></span><span></span><span></span></div>`;
+      box.appendChild(typingDiv);
+      box.scrollTop = box.scrollHeight;
+
+      try {
+          // 📝 Dùng API key từ file config
+          const API_KEY = "AIzaSyDLN92oNAfjxPBGYa6FAfraJauaPvE_Zl8";
+          if (!API_KEY || API_KEY === "YOUR_CHAT_AI_API_KEY_HERE") {
+              const box = document.getElementById('chat-messages');
+              box.innerHTML += `<div class="flex gap-4"><div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-bug"></i></div><div class="bg-red-50 border border-red-200 p-4 rounded-3xl text-red-700">⚠️ API key chưa được cấu hình trong file chat-ai.ts</div></div>`;
+              return;
+          }
+          const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+          
+          const context = `Bạn là trợ lý AI FPTU Survival Kit. Hãy trả lời thân thiện, hữu ích cho sinh viên FPTU.\n\nCâu hỏi: ${text}`;
+
+          const response = await fetch(API_URL, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+          });
+
+          const data = await response.json();
+          document.getElementById(typingId).remove();
+
+          if (!response.ok) throw new Error("Lỗi API");
+
+          if (data.candidates && data.candidates[0].content) {
+              const reply = data.candidates[0].content.parts[0].text;
+              // Dùng markdown formatter để hiển thị đẹp
+              const formattedReply = window.formatMarkdownToHTML ? 
+                  window.formatMarkdownToHTML(reply) : 
+                  reply.replace(/\n/g, '<br>');
+              
+              box.innerHTML += `<div class="flex gap-4 animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm"><i class="fa-solid fa-sparkles"></i></div><div class="bg-white border border-slate-200 p-4 rounded-3xl rounded-tl-none text-slate-700 shadow-sm max-w-[85%] leading-relaxed text-base break-words">${formattedReply}</div></div>`;
+          }
+
+      } catch (error) {
+          if(document.getElementById(typingId)) document.getElementById(typingId).remove();
+          box.innerHTML += `<div class="flex gap-4 animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 text-sm"><i class="fa-solid fa-bug"></i></div><div class="bg-red-50 border border-red-200 p-4 rounded-3xl rounded-tl-none text-red-700 shadow max-w-[85%] break-words"><b>Lỗi:</b> Mạng yếu hoặc hết tiền API rồi huhu!</div></div>`;
+      }
+      box.scrollTop = box.scrollHeight;
+  }
+
+  // --- GROUP CHAT ---
+  function toggleGroupChat() {
+      const box = document.getElementById('group-chat-box');
+      if (box.classList.contains('translate-y-full')) { box.classList.remove('translate-y-full'); } else { box.classList.add('translate-y-full'); }
+  }
+  function sendGroupChat() {
+      const inp = document.getElementById('group-chat-input');
+      const txt = inp.value.trim();
+      if(!txt) return;
+      const box = document.getElementById('group-chat-msgs');
+      const div = document.createElement('div');
+      div.className = "flex justify-end animate-[slideUp_0.2s]"; // group chat outgoing container
+      div.innerHTML = `<div class="bg-indigo-600 text-white px-4 py-2 rounded-2xl rounded-tr-none text-sm max-w-[80%] shadow-sm break-words">${txt}</div>`;
+      box.appendChild(div);
+      inp.value = "";
+      box.scrollTop = box.scrollHeight;
+      
+      setTimeout(() => {
+          const replyDiv = document.createElement('div');
+          replyDiv.className = "flex justify-start animate-[slideUp_0.2s]";
+          replyDiv.innerHTML = `<div class="bg-white border border-slate-200 px-4 py-2 rounded-2xl rounded-tl-none text-sm max-w-[80%] shadow-sm break-words"><span class="text-[10px] font-bold text-indigo-600 block mb-0.5">Minh</span>Thế à? Hay quá!</div>`;
+          box.appendChild(replyDiv);
+          box.scrollTop = box.scrollHeight;
+      }, 2000);
+  }
+
+  // --- EISENHOWER MATRIX ---
+  let eisenhowerTasks = [];
+  let currentImportance = null;
+  let currentUrgency = null;
+
+  function setEisenhowerImportance(isImportant) {
+      currentImportance = isImportant;
+      // Update buttons
+      const btn0 = document.getElementById('imp-btn-0');
+      const btn1 = document.getElementById('imp-btn-1');
+      if (isImportant === false) {
+          btn0.classList.add('bg-slate-200', 'border-slate-500', 'text-slate-800');
+          btn1.classList.remove('bg-blue-100', 'border-blue-500', 'text-blue-700');
+          btn1.classList.add('border-slate-300', 'text-slate-700');
+      } else {
+          btn0.classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+          btn0.classList.add('border-slate-300', 'text-slate-700');
+          btn1.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+          btn1.classList.remove('border-slate-300', 'text-slate-700');
+      }
+  }
+
+  function setEisenhowerUrgency(isUrgent) {
+      currentUrgency = isUrgent;
+      // Update buttons
+      const btn0 = document.getElementById('urg-btn-0');
+      const btn1 = document.getElementById('urg-btn-1');
+      if (isUrgent === false) {
+          btn0.classList.add('bg-slate-200', 'border-slate-500', 'text-slate-800');
+          btn1.classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+          btn1.classList.add('border-slate-300', 'text-slate-700');
+      } else {
+          btn0.classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+          btn0.classList.add('border-slate-300', 'text-slate-700');
+          btn1.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+          btn1.classList.remove('border-slate-300', 'text-slate-700');
+      }
+  }
+
+  function addEisenhowerTask() {
+      const nameInput = document.getElementById('task-input-name');
+      const deadlineInput = document.getElementById('task-input-deadline');
+      const taskName = nameInput.value.trim();
+      const deadline = deadlineInput.value ? new Date(deadlineInput.value).getTime() : null;
+      
+      if (!taskName) {
+          alert('Vui lòng nhập tên công việc!');
+          return;
+      }
+      
+      if (currentImportance === null || currentUrgency === null) {
+          alert('Vui lòng chọn mức độ quan trọng và gấp gáp!');
+          return;
+      }
+      
+      const task = {
+          id: Date.now(),
+          name: taskName,
+          important: currentImportance,
+          urgent: currentUrgency,
+          createdAt: new Date().toLocaleDateString('vi-VN'),
+          due: deadline,
+          notified3h: false,
+          notified1h: false
+      };
+      
+      eisenhowerTasks.push(task);
+      saveEisenhowerTasks();
+      
+      // Clear input
+      nameInput.value = '';
+      deadlineInput.value = '';
+      currentImportance = null;
+      currentUrgency = null;
+      
+      // Reset buttons
+      document.getElementById('imp-btn-0').classList.add('border-slate-300', 'text-slate-700');
+      document.getElementById('imp-btn-0').classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+      document.getElementById('imp-btn-1').classList.remove('bg-blue-100', 'border-blue-500', 'text-blue-700');
+      document.getElementById('imp-btn-1').classList.add('border-slate-300', 'text-slate-700');
+      document.getElementById('urg-btn-0').classList.add('border-slate-300', 'text-slate-700');
+      document.getElementById('urg-btn-0').classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+      document.getElementById('urg-btn-1').classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+      document.getElementById('urg-btn-1').classList.add('border-slate-300', 'text-slate-700');
+      
+      renderEisenhowerMatrix();
+      checkDeadlines();
+      saveHistory();
+  }
+
+  function deleteEisenhowerTask(id) {
+      eisenhowerTasks = eisenhowerTasks.filter(t => t.id !== id);
+      saveEisenhowerTasks();
+      renderEisenhowerMatrix();
+  }
+
+  function renderEisenhowerMatrix() {
+      // Clear all quadrants
+      ['quad-1', 'quad-2', 'quad-3', 'quad-4'].forEach(qid => {
+          document.getElementById(qid).innerHTML = '';
+      });
+      
+      eisenhowerTasks.forEach(task => {
+          let quadId;
+          if (task.urgent && task.important) {
+              quadId = 'quad-1';
+          } else if (!task.urgent && task.important) {
+              quadId = 'quad-2';
+          } else if (task.urgent && !task.important) {
+              quadId = 'quad-3';
+          } else {
+              quadId = 'quad-4';
+          }
+          
+          const taskEl = document.createElement('div');
+          taskEl.className = 'bg-white border-l-4 border-slate-400 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm hover:shadow-md transition';
+          
+          // Determine border color
+          if (quadId === 'quad-1') {
+              taskEl.classList.add('border-l-red-500', 'bg-red-50');
+          } else if (quadId === 'quad-2') {
+              taskEl.classList.add('border-l-blue-500', 'bg-blue-50');
+          } else if (quadId === 'quad-3') {
+              taskEl.classList.add('border-l-yellow-500', 'bg-yellow-50');
+          } else {
+              taskEl.classList.add('border-l-slate-400', 'bg-slate-50');
+          }
+          
+          taskEl.innerHTML = `
+              <div class="flex-1">
+                  <p class="font-semibold text-slate-800 text-sm">${task.name}</p>
+                  <p class="text-xs text-slate-500 mt-1">${task.createdAt}</p>
+              </div>
+              <button onclick="deleteEisenhowerTask(${task.id})" class="text-red-500 hover:bg-red-100 p-1.5 rounded transition flex-shrink-0">
+                  <i class="fa-solid fa-trash text-sm"></i>
+              </button>
+          `;
+          
+          document.getElementById(quadId).appendChild(taskEl);
+      });
+      
+      // Show empty state if no tasks
+      ['quad-1', 'quad-2', 'quad-3', 'quad-4'].forEach(qid => {
+          if (document.getElementById(qid).children.length === 0) {
+              const emptyEl = document.createElement('div');
+              emptyEl.className = 'text-center text-slate-400 text-sm py-8';
+              emptyEl.innerText = 'Chưa có công việc';
+              document.getElementById(qid).appendChild(emptyEl);
+          }
+      });
+  }
+
+  // Initialize Eisenhower on load
+  window.addEventListener('load', () => {
+      renderEisenhowerMatrix();
+  });
+</script>
+</body>
+</html>

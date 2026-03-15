@@ -1,0 +1,104 @@
+<!-- 🔥 Firebase Integration Script -->
+<!-- Script này sẽ được inject vào app.html để tích hợp Firebase -->
+
+<script>
+// 🚀 Initialize Firebase khi app load
+document.addEventListener('DOMContentLoaded', function() {
+    // Kiểm tra Firebase config từ environment
+    const firebaseConfig = {
+        apiKey: window.FIREBASE_API_KEY || "", // Lấy từ environment
+        authDomain: window.FIREBASE_AUTH_DOMAIN || "",
+        projectId: window.FIREBASE_PROJECT_ID || "",
+        storageBucket: window.FIREBASE_STORAGE_BUCKET || "",
+        messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "",
+        appId: window.FIREBASE_APP_ID || "",
+        databaseURL: window.FIREBASE_DATABASE_URL || ""
+    };
+    
+    // Kiểm tra config hợp lệ
+    if (!firebaseConfig.apiKey || firebaseConfig.apiKey === "") {
+        console.error("🔥 Firebase config chưa được thiết lập trong .env.local");
+        return;
+    }
+    
+    // Load Firebase SDK
+    const script1 = document.createElement('script');
+    script1.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js';
+    
+    script1.onload = function() {
+        const script2 = document.createElement('script');
+        script2.src = 'https://www.gstatic.com/firebasejs/9.22.1/firebase-database-compat.js';
+        
+        script2.onload = function() {
+            // Initialize Firebase
+            window.firebaseApp = firebase.initializeApp(firebaseConfig);
+            window.database = firebase.database();
+            
+            console.log('🔥 Firebase initialized successfully!');
+            
+            // Override localStorage functions để dùng Firebase
+            overrideLocalStorage();
+        };
+        
+        document.head.appendChild(script2);
+    };
+    
+    document.head.appendChild(script1);
+});
+
+// 🔄 Override localStorage để dùng Firebase
+function overrideLocalStorage() {
+    // Lấy user ID hiện tại (sau khi login)
+    function getCurrentUserId() {
+        const user = JSON.parse(localStorage.getItem('currentUser') || '{}');
+        return user.mssv || 'anonymous';
+    }
+    
+    // Override localStorage.setItem
+    const originalSetItem = localStorage.setItem;
+    localStorage.setItem = function(key, value) {
+        // Gọi hàm gốc trước
+        originalSetItem.call(this, key, value);
+        
+        // Sync với Firebase cho các key quan trọng
+        if (key === 'currentUser') {
+            syncUserToFirebase(value);
+        } else if (key === 'eisenhowerTasks') {
+            syncTasksToFirebase(value);
+        } else if (key === 'calc_history') {
+            syncCalcHistoryToFirebase(value);
+        }
+    };
+    
+    // Sync functions
+    function syncUserToFirebase(userStr) {
+        try {
+            const user = JSON.parse(userStr);
+            if (user.mssv) {
+                window.database.ref(`users/${user.mssv}`).set({
+                    ...user,
+                    lastLogin: new Date().toISOString()
+                });
+            }
+        } catch (e) { console.error('Error syncing user:', e); }
+    }
+    
+    function syncTasksToFirebase(tasksStr) {
+        try {
+            const tasks = JSON.parse(tasksStr);
+            const userId = getCurrentUserId();
+            window.database.ref(`tasks/${userId}`).set(tasks);
+        } catch (e) { console.error('Error syncing tasks:', e); }
+    }
+    
+    function syncCalcHistoryToFirebase(historyStr) {
+        try {
+            const history = JSON.parse(historyStr);
+            const userId = getCurrentUserId();
+            window.database.ref(`calcHistory/${userId}`).set(history);
+        } catch (e) { console.error('Error syncing calc history:', e); }
+    }
+    
+    console.log('🔄 localStorage overridden to sync with Firebase');
+}
+</script>
