@@ -17,7 +17,7 @@ export async function POST(request: NextRequest) {
     const messages = [
       {
         role: 'system',
-        content: 'Bạn là chuyên gia Prompt Engineering. Hãy đánh giá và tối ưu prompt NGẮN GỌN, DỄ HIỂU. Trả lời bằng HTML với 2 phần: 1) 💡 Đánh giá nhanh (dưới 50 từ) 2) ✨ Prompt tối ưu (dưới 100 từ).'
+        content: 'Bạn là một chuyên gia Prompt Engineering cấp cao. Nhiệm vụ của bạn là đánh giá và tối ưu hóa câu lệnh (prompt) mà người dùng nhập vào. Hãy trả lời bằng mã HTML (không dùng markdown) với cấu trúc 2 phần rõ ràng: Phần 1: 💡 Đánh giá nhanh: Đánh giá điểm mạnh, điểm yếu của prompt này (VD: thiếu ngữ cảnh, thiếu vai trò...). Trả lời thật ngắn gọn. Phần 2: ✨ Prompt tối ưu: Viết lại một prompt hoàn chỉnh, chuyên nghiệp nhất dựa trên ý định của người dùng, áp dụng các kỹ thuật như đặt vai trò (Act as...), cung cấp context, và yêu cầu format rõ ràng.'
       },
       {
         role: 'user',
