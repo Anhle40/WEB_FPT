@@ -3,17 +3,17 @@
 
 export const CHECK_PROMPT_CONFIG = {
   // 🔑 API Key cho Check Prompt
-  API_KEY: process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY || "",
+  API_KEY: process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "",
   
   // 🌐 API Endpoint
-  BASE_URL: "https://generativelanguage.googleapis.com",
+  BASE_URL: "https://openrouter.ai/api/v1",
   
-  // 📋 Model cho Check
-  MODEL: "gemini-2.5-flash",
+  // 📋 Model cho Check (Gemini 2.5 Flash Lite)
+  MODEL: "google/gemini-2.5-flash-lite",
   
   // 🔗 Full API URL
-  getApiUrl: (key: string) => 
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`,
+  getApiUrl: () => 
+    `https://openrouter.ai/api/v1/chat/completions`,
   
   // ⚙️ Config riêng cho Check
   CHECK_CONFIG: {
@@ -24,8 +24,8 @@ export const CHECK_PROMPT_CONFIG = {
   
   // ✅ Kiểm tra API key
   isValidKey: () => {
-    const key = process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_GEMINI_API_KEY;
-    return key && key !== "" && key.startsWith("AIza");
+    const key = process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    return key && key !== "" && key.startsWith("sk-or-");
   }
 };
 

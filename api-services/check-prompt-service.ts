@@ -23,31 +23,35 @@ export class CheckPromptService {
       if (!CHECK_PROMPT_CONFIG.isValidKey()) {
         return {
           success: false,
-          error: "Check Prompt API key chưa được cấu hình. Vui lòng thêm NEXT_PUBLIC_CHECK_PROMPT_API_KEY hoặc NEXT_PUBLIC_GEMINI_API_KEY vào file .env.local"
+          error: "Check Prompt API key chưa được cấu hình. Vui lòng thêm NEXT_PUBLIC_CHECK_PROMPT_API_KEY hoặc NEXT_PUBLIC_OPENROUTER_API_KEY vào file .env.local"
         };
       }
 
-      // 📝 Chuẩn bị prompt đầy đủ
-      const fullPrompt = `${CHECK_PROMPT_CONFIG.CHECK_CONFIG.systemPrompt}\n\nPrompt cần kiểm tra:\n${request.prompt}\n\nHãy trả về theo format:\n1. Phân tích: [Nội dung phân tích]\n2. Điểm đạo văn (1-10): [Điểm số]\n3. Gợi ý cải thiện: [Nội dung gợi ý]`;
-
-      // 📝 Request body
+      // 📝 Request body cho OpenRouter
       const requestBody = {
-        contents: [{
-          parts: [{
-            text: fullPrompt
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: CHECK_PROMPT_CONFIG.CHECK_CONFIG.maxTokens,
-          temperature: CHECK_PROMPT_CONFIG.CHECK_CONFIG.temperature,
-        }
+        model: CHECK_PROMPT_CONFIG.MODEL,
+        messages: [
+          {
+            role: "system",
+            content: CHECK_PROMPT_CONFIG.CHECK_CONFIG.systemPrompt
+          },
+          {
+            role: "user",
+            content: `Prompt cần kiểm tra:\n${request.prompt}\n\nHãy trả về theo format:\n1. Phân tích: [Nội dung phân tích]\n2. Điểm đạo văn (1-10): [Điểm số]\n3. Gợi ý cải thiện: [Nội dung gợi ý]`
+          }
+        ],
+        max_tokens: CHECK_PROMPT_CONFIG.CHECK_CONFIG.maxTokens,
+        temperature: CHECK_PROMPT_CONFIG.CHECK_CONFIG.temperature,
       };
 
-      // 🌐 Gọi API
-      const response = await fetch(CHECK_PROMPT_CONFIG.getApiUrl(CHECK_PROMPT_CONFIG.API_KEY), {
+      // 🌐 Gọi API OpenRouter
+      const response = await fetch(CHECK_PROMPT_CONFIG.getApiUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CHECK_PROMPT_CONFIG.API_KEY}`,
+          'HTTP-Referer': 'https://fptu-survival-kit.vercel.app',
+          'X-Title': 'FPTU Survival Kit'
         },
         body: JSON.stringify(requestBody)
       });
@@ -58,8 +62,8 @@ export class CheckPromptService {
 
       const data = await response.json();
       
-      // 📤 Xử lý kết quả
-      const result = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+      // 📤 Xử lý kết quả (OpenRouter format)
+      const result = data.choices?.[0]?.message?.content || '';
       
       // 🎯 Parse kết quả (đơn giản)
       const analysis = result;

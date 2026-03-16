@@ -22,31 +22,35 @@ export class ChatAIService {
       if (!CHAT_AI_CONFIG.isValidKey()) {
         return {
           success: false,
-          error: "Chat AI API key chưa được cấu hình. Vui lòng thêm NEXT_PUBLIC_CHAT_AI_API_KEY hoặc NEXT_PUBLIC_GEMINI_API_KEY vào file .env.local"
+          error: "Chat AI API key chưa được cấu hình. Vui lòng thêm NEXT_PUBLIC_CHAT_AI_API_KEY hoặc NEXT_PUBLIC_OPENROUTER_API_KEY vào file .env.local"
         };
       }
 
-      // 📝 Chuẩn bị prompt đầy đủ
-      const fullPrompt = `${CHAT_AI_CONFIG.CHAT_CONFIG.systemPrompt}\n\nCâu hỏi từ sinh viên: ${request.message}`;
-
-      // 📝 Request body
+      // 📝 Request body cho OpenRouter
       const requestBody = {
-        contents: [{
-          parts: [{
-            text: fullPrompt
-          }]
-        }],
-        generationConfig: {
-          maxOutputTokens: CHAT_AI_CONFIG.CHAT_CONFIG.maxTokens,
-          temperature: CHAT_AI_CONFIG.CHAT_CONFIG.temperature,
-        }
+        model: CHAT_AI_CONFIG.MODEL,
+        messages: [
+          {
+            role: "system",
+            content: CHAT_AI_CONFIG.CHAT_CONFIG.systemPrompt
+          },
+          {
+            role: "user",
+            content: request.message
+          }
+        ],
+        max_tokens: CHAT_AI_CONFIG.CHAT_CONFIG.maxTokens,
+        temperature: CHAT_AI_CONFIG.CHAT_CONFIG.temperature,
       };
 
-      // 🌐 Gọi API
-      const response = await fetch(CHAT_AI_CONFIG.getApiUrl(CHAT_AI_CONFIG.API_KEY), {
+      // 🌐 Gọi API OpenRouter
+      const response = await fetch(CHAT_AI_CONFIG.getApiUrl(), {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${CHAT_AI_CONFIG.API_KEY}`,
+          'HTTP-Referer': 'https://fptu-survival-kit.vercel.app',
+          'X-Title': 'FPTU Survival Kit'
         },
         body: JSON.stringify(requestBody)
       });
@@ -57,8 +61,8 @@ export class ChatAIService {
 
       const data = await response.json();
       
-      // 📤 Trả về kết quả
-      const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || 'Xin lỗi, tôi không thể trả lời câu hỏi này.';
+      // 📤 Trả về kết quả (OpenRouter format)
+      const reply = data.choices?.[0]?.message?.content || 'Xin lỗi, tôi không thể trả lời câu hỏi này.';
       
       return {
         success: true,
