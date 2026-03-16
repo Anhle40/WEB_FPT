@@ -77,6 +77,9 @@
   
   <!-- 🧪 API Test Script -->
   <script src="api-test.js"></script>
+  
+  <!-- 🤖 API Client Script -->
+  <script src="api-client.js"></script>
 </head>
 <body class="text-slate-800 h-screen flex flex-col break-words">
 
@@ -1033,52 +1036,18 @@ document.addEventListener('keydown', e=>{
       r.innerHTML = `<span class="text-slate-400"><i class='fa-solid fa-spinner fa-spin'></i> Đang phân tích và tối ưu prompt...</span>`;
 
       try {
-          const API_KEY = window.OPENROUTER_API_KEY || "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";
-          if (!API_KEY || !API_KEY.startsWith("sk-or-")) {
-              document.getElementById('prompt-res').innerHTML = `<span class="text-red-600 font-bold">⚠️ OpenRouter API key chưa được cấu hình</span>`;
-              return;
-          }
-          const API_URL = `https://openrouter.ai/api/v1/chat/completions`;
-
-          const response = await fetch(API_URL, {
-              method: "POST",
-              headers: { 
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${API_KEY}`,
-                  "HTTP-Referer": "https://fptu-survival-kit.vercel.app",
-                  "X-Title": "FPTU Survival Kit"
-              },
-              body: JSON.stringify({ 
-                  model: "google/gemini-2.5-flash-lite", // Quay lại Gemini 2.5 Flash Lite
-                  messages: [
-                      {
-                          role: "system",
-                          content: "Bạn là chuyên gia Prompt Engineering. Hãy đánh giá và tối ưu prompt NGẮN GỌN, DỄ HIỂU. Trả lời bằng HTML với 2 phần: 1) 💡 Đánh giá nhanh (dưới 50 từ) 2) ✨ Prompt tối ưu (dưới 100 từ)."
-                      },
-                      {
-                          role: "user",
-                          content: v
-                      }
-                  ],
-                  max_tokens: 400,
-                  temperature: 0.3
-              })
-          });
-
-          const data = await response.json();
-          if (!response.ok) throw new Error(data.error?.message || 'Lỗi API');
-
-          if (data.choices && data.choices[0].message) {
-              const reply = data.choices[0].message.content;
-              // Dùng markdown formatter để hiển thị đẹp
-              const formattedReply = window.formatMarkdownToHTML ? 
-                  window.formatMarkdownToHTML(reply) : 
-                  reply.replace(/\n/g, '<br>');
-              
-              r.innerHTML = formattedReply;
-          } else {
-              r.innerHTML = `<span class="text-red-600">Không nhận được phản hồi hợp lệ từ AI.</span>`;
-          }
+          // 🤖 Sử dụng API client (không expose API key)
+          console.log('🔍 Starting prompt check via API route...');
+          
+          const reply = await window.checkPrompt(v);
+          console.log('💬 AI Reply:', reply);
+          
+          // Dùng markdown formatter để hiển thị đẹp
+          const formattedReply = window.formatMarkdownToHTML ? 
+              window.formatMarkdownToHTML(reply) : 
+              reply.replace(/\n/g, '<br>');
+          
+          r.innerHTML = formattedReply;
       } catch (err) {
           console.error(err);
           r.innerHTML = `<span class="text-red-600 font-bold"><i class='fa-solid fa-triangle-exclamation'></i> Lỗi: ${err.message || 'Mất mạng hoặc API'}</span>`;
@@ -1121,173 +1090,43 @@ document.addEventListener('keydown', e=>{
       box.scrollTop = box.scrollHeight;
 
       try {
-          // 🔍 DEBUG: Log tất cả các giá trị
-          console.log('🚀 Starting API call...');
+          // 🤖 Sử dụng API client (không expose API key)
+          console.log('🚀 Starting API call via API route...');
           console.log('📝 User message:', text);
           
-          // 🤖 Lấy API key - ưu tiên từ window, fallback hardcoded
-          const API_KEY = window.OPENROUTER_API_KEY || "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";
-          console.log('🔑 API Key format check:', API_KEY ? API_KEY.substring(0, 15) + '...' : 'MISSING');
-          console.log('🔑 API Key starts with sk-or-?', API_KEY.startsWith('sk-or-'));
-          console.log('🔑 API Key length:', API_KEY ? API_KEY.length : 0);
-          
-          if (!API_KEY || !API_KEY.startsWith("sk-or-")) {
-              throw new Error("OpenRouter API key không hợp lệ hoặc thiếu");
-          }
-          
-          const API_URL = "https://openrouter.ai/api/v1/chat/completions";
-          console.log('🌐 API URL:', API_URL);
-          
-          // 🧪 Test với model khác trước
-          const modelsToTest = [
-            "google/gemini-2.5-flash-lite",
-            "google/gemini-2.5-flash",
-            "google/gemini-pro",
-            "openai/gpt-3.5-turbo"
-          ];
-          
-          let selectedModel = "google/gemini-2.5-flash-lite"; // Quay lại Gemini 2.5 Flash Lite
-          console.log('🎯 Trying model:', selectedModel);
-          
-          // 📝 Request body theo đúng format OpenRouter
-          const requestBody = {
-              model: selectedModel,
-              messages: [
-                  {
-                      role: "system",
-                      content: "Bạn là trợ lý AI FPTU Survival Kit. Hãy trả lời NGẮN GỌN, XÚC TÍCH, DỄ HIỂU (dưới 100 từ). Tập trung vào giải pháp thực tế cho sinh viên FPTU. Trả lời như người bạn thân thiện, không dùng câu quá trang trọng."
-                  },
-                  {
-                      role: "user",
-                      content: text
-                  }
-              ],
-              max_tokens: 300,
-              temperature: 0.7
-          };
-          
-          console.log('📦 Request body:', JSON.stringify(requestBody, null, 2));
-          
-          // 🌐 Gọi API với đầy đủ headers
-          const response = await fetch(API_URL, {
-              method: "POST",
-              headers: {
-                  "Content-Type": "application/json",
-                  "Authorization": `Bearer ${API_KEY}`,
-                  "HTTP-Referer": "https://fptu-survival-kit.vercel.app",
-                  "X-Title": "FPTU Survival Kit Chat"
-              },
-              body: JSON.stringify(requestBody)
-          });
-          
-          console.log('📊 Response status:', response.status);
-          console.log('📊 Response statusText:', response.statusText);
-          console.log('📊 Response headers:', Object.fromEntries(response.headers.entries()));
-          
-          const data = await response.json();
-          console.log('📄 Full response data:', data);
+          const reply = await window.sendChatMessage(text);
+          console.log('💬 AI Reply:', reply);
           
           // Remove typing indicator
           if(document.getElementById(typingId)) document.getElementById(typingId).remove();
-
-          if (!response.ok) {
-              console.log('❌ API Error Response:', data);
-              console.log('❌ Error details:', {
-                status: response.status,
-                statusText: response.statusText,
-                error: data.error,
-                message: data.message
-              });
               
-              // 🔄 Thử với model khác nếu model hiện tại lỗi
-              if (response.status === 400 && data.error?.message?.includes('model')) {
-                console.log('🔄 Model error, trying fallback model...');
-                selectedModel = "openai/gpt-3.5-turbo";
-                requestBody.model = selectedModel;
-                
-                const fallbackResponse = await fetch(API_URL, {
-                  method: "POST",
-                  headers: {
-                      "Content-Type": "application/json",
-                      "Authorization": `Bearer ${API_KEY}`,
-                      "HTTP-Referer": "https://fptu-survival-kit.vercel.app",
-                      "X-Title": "FPTU Survival Kit Chat"
-                  },
-                  body: JSON.stringify(requestBody)
-                });
-                
-                const fallbackData = await fallbackResponse.json();
-                console.log('🔄 Fallback response:', fallbackData);
-                
-                if (fallbackResponse.ok && fallbackData.choices && fallbackData.choices[0]) {
-                  const reply = fallbackData.choices[0].message.content;
-                  const formattedReply = window.formatMarkdownToHTML ? 
-                      window.formatMarkdownToHTML(reply) : 
-                      reply.replace(/\n/g, '<br>');
-                  
-                  box.innerHTML += `
-                    <div class="flex gap-4 animate-[slideUp_0.3s]">
-                      <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm shadow-lg">
-                        <i class="fa-solid fa-sparkles"></i>
-                      </div>
-                      <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] leading-relaxed text-base break-words">
-                        <div class="text-xs text-blue-600 font-medium mb-2 flex items-center gap-1">
-                          <i class="fa-solid fa-robot"></i>
-                          <span>FPTU AI Assistant (Fallback)</span>
-                        </div>
-                        <div class="text-slate-700">${formattedReply}</div>
-                        <div class="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                          <span>🚀 Powered by GPT-3.5 Turbo</span>
-                          <span>•</span>
-                          <span>${new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span>
-                        </div>
-                      </div>
-                    </div>
-                  `;
-                  console.log('✅ Fallback model worked!');
-                  return;
-                }
-              }
-              
-              throw new Error(`API Error ${response.status}: ${data.error?.message || data.message || 'Unknown error'}`);
-          }
-
-          // ✅ Kiểm tra response format của OpenRouter
-          if (data.choices && data.choices[0] && data.choices[0].message) {
-              const reply = data.choices[0].message.content;
-              console.log('💬 AI Reply:', reply);
-              
-              // Format reply for display với design thân thiện hơn
-              const formattedReply = window.formatMarkdownToHTML ? 
-                  window.formatMarkdownToHTML(reply) : 
-                  reply.replace(/\n/g, '<br>');
-              
-              // 🎨 Design mới thân thiện hơn
-              box.innerHTML += `
-                <div class="flex gap-4 animate-[slideUp_0.3s]">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm shadow-lg">
-                    <i class="fa-solid fa-sparkles"></i>
-                  </div>
-                  <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] leading-relaxed text-base break-words">
-                    <div class="text-xs text-blue-600 font-medium mb-2 flex items-center gap-1">
-                      <i class="fa-solid fa-robot"></i>
-                      <span>FPTU AI Assistant</span>
-                    </div>
-                    <div class="text-slate-700">${formattedReply}</div>
-                    <div class="text-xs text-slate-400 mt-2 flex items-center gap-2">
-                      <span>🚀 Powered by Gemini 2.5 Flash</span>
-                      <span>•</span>
-                      <span>${new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span>
-                    </div>
-                  </div>
+          // Format reply for display với design thân thiện hơn
+          const formattedReply = window.formatMarkdownToHTML ? 
+              window.formatMarkdownToHTML(reply) : 
+              reply.replace(/\n/g, '<br>');
+          
+          // 🎨 Design mới thân thiện hơn
+          box.innerHTML += `
+            <div class="flex gap-4 animate-[slideUp_0.3s]">
+              <div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm shadow-lg">
+                <i class="fa-solid fa-sparkles"></i>
+              </div>
+              <div class="bg-gradient-to-br from-blue-50 to-cyan-50 border border-blue-200 p-4 rounded-2xl rounded-tl-none shadow-sm max-w-[85%] leading-relaxed text-base break-words">
+                <div class="text-xs text-blue-600 font-medium mb-2 flex items-center gap-1">
+                  <i class="fa-solid fa-robot"></i>
+                  <span>FPTU AI Assistant</span>
                 </div>
-              `;
-              
-              console.log('✅ Message displayed successfully');
-          } else {
-              console.log('❌ Invalid response format:', data);
-              throw new Error('API response không đúng format');
-          }
+                <div class="text-slate-700">${formattedReply}</div>
+                <div class="text-xs text-slate-400 mt-2 flex items-center gap-2">
+                  <span>🚀 Powered by Gemini 2.5 Flash</span>
+                  <span>•</span>
+                  <span>${new Date().toLocaleTimeString('vi-VN', {hour: '2-digit', minute:'2-digit'})}</span>
+                </div>
+              </div>
+            </div>
+          `;
+          
+          console.log('✅ Message displayed successfully');
 
       } catch (error) {
           console.log('💥 Chat Error:', error);

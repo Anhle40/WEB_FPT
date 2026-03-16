@@ -29,10 +29,10 @@ async function sendChat(optionalText = null) {
         console.log('🚀 Starting API call...');
         console.log('📝 User message:', text);
         
-        // 🤖 Lấy API key - ưu tiên từ window, fallback hardcoded
-        const API_KEY = window.OPENROUTER_API_KEY || "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";
+        // 🤖 Lấy API key từ environment variable (KHÔNG HARDCODE)
+        const API_KEY = window.OPENROUTER_API_KEY;
         console.log('🔑 API Key format check:', API_KEY ? API_KEY.substring(0, 15) + '...' : 'MISSING');
-        console.log('🔑 API Key starts with sk-or-?', API_KEY.startsWith('sk-or-'));
+        console.log('🔑 API Key starts with sk-or-?', API_KEY && API_KEY.startsWith('sk-or-'));
         
         if (!API_KEY || !API_KEY.startsWith("sk-or-")) {
             throw new Error("OpenRouter API key không hợp lệ hoặc thiếu");

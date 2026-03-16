@@ -13,8 +13,8 @@ async function checkPrompt(){
     console.log('📝 Input prompt:', v);
 
     try {
-        // 🤖 Lấy API key
-        const API_KEY = window.OPENROUTER_API_KEY || "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";
+        // 🤖 Lấy API key từ environment variable (KHÔNG HARDCODE)
+        const API_KEY = window.OPENROUTER_API_KEY;
         console.log('🔑 API Key format check:', API_KEY ? API_KEY.substring(0, 15) + '...' : 'MISSING');
         
         if (!API_KEY || !API_KEY.startsWith("sk-or-")) {

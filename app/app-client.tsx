@@ -6,7 +6,11 @@ export default function AppClient() {
   useEffect(() => {
     // Set API keys từ environment variable vào window object
     // để HTML inline script có thể truy cập
-    (window as any).OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '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';
+    (window as any).OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
+    
+    // Debug: Log API key status
+    console.log('🔑 Environment API Key:', process.env.NEXT_PUBLIC_OPENROUTER_API_KEY ? '✅ Found' : '❌ Missing');
+    console.log('🔑 Window API Key:', (window as any).OPENROUTER_API_KEY ? '✅ Set' : '❌ Not set');
     
     // 🔥 Set Firebase config cho HTML
     (window as any).FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '';
