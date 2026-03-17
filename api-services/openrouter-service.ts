@@ -9,6 +9,7 @@ import {
   AIServiceConfig,
   OpenRouterMessage 
 } from '../types/openrouter';
+import { API_KEYS } from '../api-keys';
 
 /**
  * OpenRouter AI Service - A robust, reusable service for AI API calls
@@ -152,9 +153,16 @@ export class OpenRouterService {
    * @private
    */
   private static mergeConfig(options: Partial<AIServiceConfig>): AIServiceConfig {
-    const envApiKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || 
+    // Import API key từ secure file
+    const envApiKey = API_KEYS.OPENROUTER ||
                      process.env.OPENROUTER_API_KEY || 
+                     process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || 
                      '';
+    
+    // DEBUG: Log để kiểm tra
+    console.log('🔑 DEBUG - API Key Status:');
+    console.log('Imported Key: ✅ Set');
+    console.log('Final API Key:', envApiKey ? envApiKey.substring(0, 10) + '...' : '❌ Empty');
     
     return {
       ...this.DEFAULT_CONFIG,

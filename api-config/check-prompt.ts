@@ -1,9 +1,13 @@
 // 🔍 CHECK PROMPT API CONFIGURATION  
 // File config riêng cho Check Đạo văn AI
 
+import { API_KEYS } from '../api-keys';
+
 export const CHECK_PROMPT_CONFIG = {
-  // 🔑 API Key cho Check Prompt
-  API_KEY: process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "",
+  // 🔑 API Key cho Check Prompt - Import từ secure file
+  API_KEY: API_KEYS.OPENROUTER ||
+           process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || 
+           process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || "",
   
   // 🌐 API Endpoint
   BASE_URL: "https://openrouter.ai/api/v1",
@@ -24,7 +28,10 @@ export const CHECK_PROMPT_CONFIG = {
   
   // ✅ Kiểm tra API key
   isValidKey: () => {
-    const key = process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    const key = API_KEYS.OPENROUTER ||
+              process.env.NEXT_PUBLIC_CHECK_PROMPT_API_KEY || 
+              process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    console.log('🔍 DEBUG - Check Prompt API Key:', key ? key.substring(0, 10) + '...' : '❌ Empty');
     return key && key !== "" && key.startsWith("sk-or-");
   }
 };

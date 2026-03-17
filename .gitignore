@@ -17,3 +17,4 @@ node_modules/
 .env.development
 firebase-config.json
 serviceAccountKey.json
+api-keys.ts

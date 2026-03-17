@@ -1,11 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { API_KEYS } from '../../../api-keys';
 
 export async function POST(request: NextRequest) {
   try {
     const { prompt, model = 'google/gemini-2.5-flash-lite', max_tokens = 600, temperature = 0.3 } = await request.json();
 
-    // Lấy API key từ environment variable (server-side only)
-    const apiKey = process.env.OPENROUTER_API_KEY;
+    // Import API key từ secure file
+    const apiKey = API_KEYS.OPENROUTER || 
+                   process.env.OPENROUTER_API_KEY || 
+                   process.env.NEXT_PUBLIC_OPENROUTER_API_KEY;
+    
+    console.log('🔍 DEBUG - Check Prompt Route API Key:', apiKey ? apiKey.substring(0, 10) + '...' : '❌ Empty');
     
     if (!apiKey || !apiKey.startsWith('sk-or-')) {
       return NextResponse.json(
