@@ -4,15 +4,11 @@ import { useEffect } from 'react';
 
 export default function AppClient() {
   useEffect(() => {
-    // Set API keys từ environment variable vào window object
+    // 🔐 Set API keys từ environment variable vào window object
     // để HTML inline script có thể truy cập
     (window as any).OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
     
-    // Debug: Log API key status
-    console.log('🔑 Environment API Key:', process.env.NEXT_PUBLIC_OPENROUTER_API_KEY ? '✅ Found' : '❌ Missing');
-    console.log('🔑 Window API Key:', (window as any).OPENROUTER_API_KEY ? '✅ Set' : '❌ Not set');
-    
-    // 🔥 Set Firebase config cho HTML
+    //  Set Firebase config cho HTML
     (window as any).FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '';
     (window as any).FIREBASE_AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '';
     (window as any).FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '';
@@ -20,6 +16,16 @@ export default function AppClient() {
     (window as any).FIREBASE_MESSAGING_SENDER_ID = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '';
     (window as any).FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '';
     (window as any).FIREBASE_DATABASE_URL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || '';
+    (window as any).FIREBASE_MEASUREMENT_ID = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '';
+    
+    // 🤖 Set Gemini API key cho calc_full.txt
+    (window as any).GEMINI_API_KEY = process.env.NEXT_PUBLIC_GEMINI_API_KEY || '';
+    
+    // Debug: Log API key status
+    console.log('🔑 Environment API Keys Status:');
+    console.log('- OpenRouter:', process.env.NEXT_PUBLIC_OPENROUTER_API_KEY ? '✅ Found' : '❌ Missing');
+    console.log('- Firebase:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✅ Found' : '❌ Missing');
+    console.log('- Gemini:', process.env.NEXT_PUBLIC_GEMINI_API_KEY ? '✅ Found' : '❌ Missing');
     
       }, []);
 

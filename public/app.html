@@ -286,10 +286,34 @@
     .mobile-content-padding {
       padding-bottom: 5rem;
     }
+    
+    /* 🎨 Google Sign-In Button Styles */
+    .google-signin-loading {
+      background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%) !important;
+      cursor: not-allowed !important;
+      transform: none !important;
+    }
+    
+    .google-signin-loading svg {
+      opacity: 0.6;
+    }
+    
+    /* 🎨 Notification Styles */
+    .notification-success {
+      background: linear-gradient(135deg, #10b981 0%, #059669 100%) !important;
+      border-left: 4px solid #047857 !important;
+    }
+    
+    .notification-error {
+      background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%) !important;
+      border-left: 4px solid #b91c1c !important;
+    }
+    
+    .notification-info {
+      background: linear-gradient(135deg, #3b82f6 0%, #2563eb 100%) !important;
+      border-left: 4px solid #1d4ed8 !important;
+    }
   </style>
-  
-  <!-- 🔥 Firebase Integration -->
-  <script src="firebase-integration.html"></script>
   
   <!-- 🎨 Markdown Formatter -->
   <script src="markdown-formatter.js"></script>
@@ -311,22 +335,8 @@
             <p class="text-slate-300 text-lg mt-2">Hệ sinh thái FPTU Survival</p>
         </div>
         
-        <form class="form" onsubmit="event.preventDefault(); handleLogin();">
-            <p id="heading">Login</p>
-            
-            <div class="field">
-                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M13.106 7.222c0-2.967-2.249-5.032-5.482-5.032-3.35 0-5.646 2.318-5.646 5.702 0 3.493 2.235 5.708 5.762 5.708.862 0 1.689-.123 2.304-.335v-.862c-.43.199-1.354.328-2.29.328-2.926 0-4.813-1.88-4.813-4.798 0-2.844 1.921-4.881 4.594-4.881 2.735 0 4.608 1.688 4.608 4.156 0 1.682-.554 2.769-1.416 2.769-.492 0-.772-.28-.772-.76V5.206H8.923v.834h-.11c-.266-.595-.881-.964-1.6-.964-1.4 0-2.378 1.162-2.378 2.823 0 1.737.957 2.906 2.379 2.906.8 0 1.415-.39 1.709-1.087h.11c.081.67.703 1.148 1.503 1.148 1.572 0 2.57-1.415 2.57-3.643zm-7.177.704c0-1.197.54-1.907 1.456-1.907.93 0 1.524.738 1.524 1.907S8.308 9.84 7.371 9.84c-.895 0-1.442-.725-1.442-1.914z"></path>
-                </svg>
-                <input autocomplete="off" id="fullname" placeholder="Username" class="input-field" type="text" required>
-            </div>
-            
-            <div class="field">
-                <svg class="input-icon" xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
-                    <path d="M8 1a2 2 0 0 1 2 2v4H6V3a2 2 0 0 1 2-2zm3 6V3a3 3 0 0 0-6 0v4a2 2 0 0 0-2 2v5a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2V9a2 2 0 0 0-2-2z"></path>
-                </svg>
-                <input id="mssv" placeholder="Password" class="input-field" type="text" required>
-            </div>
+        <form class="form" onsubmit="event.preventDefault(); loginWithGoogle();">
+            <p id="heading">Chào mừng đến với FPTU Survival Kit</p>
             
             <div class="form-grid">
                 <div>
@@ -354,11 +364,16 @@
             </div>
             
             <div class="btn">
-                <button type="submit" class="button1">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Login&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;</button>
-                <button type="button" class="button2" onclick="alert('Tính năng đăng ký coming soon!')">Sign Up</button>
+                <button type="submit" class="button1 w-full flex items-center justify-center gap-3">
+                    <svg class="w-5 h-5" viewBox="0 0 24 24">
+                        <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/>
+                        <path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/>
+                        <path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/>
+                        <path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/>
+                    </svg>
+                    Đăng nhập bằng Google
+                </button>
             </div>
-            
-            <button type="button" class="button3" onclick="alert('Tính năng quên mật khẩu coming soon!')">Forgot Password</button>
         </form>
     </div>
   </section>
@@ -1169,6 +1184,146 @@ document.addEventListener('keydown', e=>{
       } else { alert("Vui lòng điền đủ Tên và MSSV!"); }
   }
 
+  // --- GOOGLE LOGIN FUNCTION ---
+  async function loginWithGoogle() {
+      try {
+          // 1. Lấy giá trị từ dropdown campus và faculty
+          const campus = document.getElementById('campus').value;
+          const faculty = document.getElementById('faculty').value;
+          
+          // Validate faculty selection
+          if (!faculty) {
+              alert('Vui lòng chọn Khối Ngành!');
+              return;
+          }
+          
+          console.log('🔥 Starting Google login with:', { campus, faculty });
+          
+          // 2. Gọi signInWithPopup của Firebase
+          const provider = new window.GoogleAuthProvider();
+          const result = await window.signInWithPopup(window.firebaseAuth, provider);
+          const user = result.user;
+          
+          console.log('✅ Google login successful:', user);
+          
+          // 3. Lấy data trả về
+          const userData = {
+              uid: user.uid,
+              displayName: user.displayName,
+              email: user.email,
+              photoURL: user.photoURL,
+              campus: campus,
+              faculty: faculty,
+              lastLogin: new Date().toISOString()
+          };
+          
+          // 4. LƯU VÀO DATABASE (Firestore)
+          try {
+              const userDocRef = window.doc(window.firebaseDb, 'users', user.uid);
+              await window.setDoc(userDocRef, userData, { merge: true });
+              console.log('💾 User data saved to Firestore');
+          } catch (dbError) {
+              console.error('❌ Error saving to Firestore:', dbError);
+              // Vẫn tiếp tục ngay cả khi database lỗi
+          }
+          
+          // 5. ĐỒNG BỘ UI (Giữ nguyên logic cũ)
+          currentUser = {
+              name: user.displayName,
+              campus: campus,
+              faculty: faculty,
+              avatar: user.photoURL,
+              uid: user.uid
+          };
+          
+          // Gán data vào UI elements (y hệt như handleLogin cũ)
+          document.getElementById('welcome-name').innerText = currentUser.name;
+          document.getElementById('welcome-campus').innerText = currentUser.campus;
+          
+          // Update sidebar user info
+          const sidebarUsername = document.getElementById('sidebar-username');
+          const sidebarAvatar = document.getElementById('sidebar-user-avatar');
+          const sidebarUserInfo = document.getElementById('sidebar-user-info');
+          
+          if(sidebarUsername) sidebarUsername.innerText = currentUser.name;
+          if(sidebarAvatar) {
+              if(currentUser.avatar) {
+                  sidebarAvatar.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full rounded-full object-cover">`;
+              } else {
+                  sidebarAvatar.innerText = currentUser.name.charAt(0).toUpperCase();
+              }
+          }
+          if(sidebarUserInfo) {
+              if(currentUser.faculty) {
+                  const facultyText = document.getElementById('faculty').options[document.getElementById('faculty').selectedIndex].text;
+                  sidebarUserInfo.innerText = facultyText;
+                  document.getElementById('welcome-faculty').innerText = facultyText;
+              } else {
+                  sidebarUserInfo.innerText = 'FPTU';
+                  document.getElementById('welcome-faculty').innerText = currentUser.faculty || '--';
+              }
+          }
+
+          // update avatar displays (header + any user-avt-display elements)
+          const setAvatarElem = e => {
+              if(currentUser.avatar) {
+                  e.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full rounded-full object-cover">`;
+              } else {
+                  e.innerText = currentUser.name.charAt(0).toUpperCase();
+              }
+          };
+          document.querySelectorAll('.user-avt-display').forEach(setAvatarElem);
+          const headerAvt = document.getElementById('user-avatar');
+          if(headerAvt) setAvatarElem(headerAvt);
+          
+          const localBadge = document.getElementById('local-badge');
+          if(localBadge) localBadge.innerText = currentUser.campus.substring(0,2).toUpperCase();
+          
+          const campusDisplay = document.getElementById('current-campus-display');
+          if(campusDisplay) campusDisplay.innerText = currentUser.campus;
+
+          // Ẩn login screen, hiện main app
+          document.getElementById('login-screen').classList.add('hidden');
+          document.getElementById('main-app').classList.remove('hidden');
+          document.getElementById('main-app').classList.add('flex');
+          
+          switchView('home');
+          filterFeed('local');
+          
+          // Lưu vào localStorage
+          localStorage.setItem('fptu_user_session', JSON.stringify(currentUser));
+          
+          // capture initial state
+          saveHistory();
+          
+          // Initialize community features
+          if (window.initCommunity) {
+              window.initCommunity();
+              window.startCommunityListener();
+          }
+          
+          console.log('🎉 Login completed successfully!');
+          
+      } catch (error) {
+          console.error('❌ Google login error:', error);
+          
+          // Handle specific Firebase errors
+          let errorMessage = 'Đăng nhập thất bại. Vui lòng thử lại.';
+          
+          if (error.code === 'auth/popup-closed-by-user') {
+              errorMessage = 'Đăng nhập bị hủy.';
+          } else if (error.code === 'auth/popup-blocked') {
+              errorMessage = 'Popup bị chặn. Vui lòng cho phép popup và thử lại.';
+          } else if (error.code === 'auth/network-request-failed') {
+              errorMessage = 'Lỗi kết nối mạng. Vui lòng kiểm tra internet.';
+          } else if (error.code === 'auth/too-many-requests') {
+              errorMessage = 'Quá nhiều lần thử. Vui lòng thử lại sau.';
+          }
+          
+          alert(errorMessage);
+      }
+  }
+
   // Hàm kiểm tra và phục hồi trạng thái đăng nhập khi F5
   function checkLoginState() {
       const savedSession = localStorage.getItem('fptu_user_session');
@@ -1244,22 +1399,21 @@ document.addEventListener('keydown', e=>{
 
   // Hàm đăng xuất
   function handleLogout() {
-      // Xóa session
+      // Xóa session data
       localStorage.removeItem('fptu_user_session');
+      localStorage.removeItem('currentUser');
       
       // Reset UI
       document.getElementById('main-app').classList.add('hidden');
       document.getElementById('main-app').classList.remove('flex');
       document.getElementById('login-screen').classList.remove('hidden');
       
-      // Xóa sạch form đăng nhập
-      document.getElementById('fullname').value = '';
-      document.getElementById('mssv').value = '';
+      // Reset dropdowns về giá trị mặc định
       document.getElementById('campus').value = 'Đà Nẵng';
       document.getElementById('faculty').value = '';
       
       // Reset currentUser
-      currentUser = { name: '', campus: '', faculty: '' };
+      currentUser = { name: '', campus: '', faculty: '', avatar: '', uid: '' };
       
       console.log('✅ Đã đăng xuất thành công');
   }
@@ -1620,65 +1774,172 @@ document.addEventListener('keydown', e=>{
   function filterFeed(type) {
       currentFeedType = type;
       const container = document.getElementById('social-feed');
-      container.innerHTML = "";
       
       const btnLocal = document.getElementById('tab-local');
       const btnGlobal = document.getElementById('tab-global');
       const chatName = document.getElementById('chat-room-name');
 
+      // Update button states instantly
       if(type==='local'){
-          btnLocal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
-          btnGlobal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
+          btnLocal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition-all duration-200";
+          btnGlobal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all duration-200";
           if(chatName) chatName.innerText = currentUser.campus; 
       } else {
-          btnLocal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
-          btnGlobal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
+          btnLocal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition-all duration-200";
+          btnGlobal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition-all duration-200";
           if(chatName) chatName.innerText = "Toàn quốc (5 Miền)";
       }
 
+      // Simple fade out
+      container.style.transition = 'opacity 0.2s ease';
+      container.style.opacity = '0';
+      
+      setTimeout(() => {
+          container.innerHTML = "";
+          
+          // Load posts from Firestore first, then filter
+          if (window.loadPostsFromFirestore) {
+              window.loadPostsFromFirestore().then(firestorePosts => {
+                  // Merge local posts with Firestore posts
+                  const allPosts = [...firestorePosts, ...posts];
+                  
+                  // Remove duplicates (keep latest version)
+                  const uniquePosts = allPosts.reduce((acc, post) => {
+                      const existingIndex = acc.findIndex(p => p.id === post.id);
+                      if (existingIndex === -1) {
+                          acc.push(post);
+                      } else {
+                          // Keep the one with newer timestamp
+                          if (new Date(post.timestamp) > new Date(acc[existingIndex].timestamp)) {
+                              acc[existingIndex] = post;
+                          }
+                      }
+                      return acc;
+                  }, []);
+                  
+                  // Sort by timestamp (newest first)
+                  uniquePosts.sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+                  
+                  // Update global posts array
+                  posts.length = 0;
+                  posts.push(...uniquePosts);
+                  
+                  const filtered = uniquePosts.filter(p => {
+                      const scope = p.scope || 'local';
+                      if(type === 'global') return scope === 'global';
+                      return scope === 'local' && p.campus === currentUser.campus;
+                  });
+                  
+                  renderFilteredPosts(filtered, type);
+              }).catch(error => {
+                  console.error('❌ Error loading from Firestore:', error);
+                  // Fallback to local posts
+                  renderLocalPosts(type);
+              });
+          } else {
+              // Fallback to local posts only
+              renderLocalPosts(type);
+          }
+      }, 200);
+  }
+
+  // Helper function to render local posts
+  function renderLocalPosts(type) {
       const filtered = posts.filter(p => {
-          const scope = p.scope || 'local'; // default older posts to local
+          const scope = p.scope || 'local';
           if(type === 'global') return scope === 'global';
-          // local feed: only posts scoped local and matching campus
           return scope === 'local' && p.campus === currentUser.campus;
       });
       
-      filtered.forEach(p => {
-          let imgHtml = p.img ? `<img src="${p.img}" onclick="viewImage(this.src)" class="w-full h-auto max-h-[500px] object-cover rounded-2xl mt-4 mb-2 border border-slate-100 cursor-pointer">` : "";
-          let commentsHtml = p.cmts.map(c => `<div class="bg-slate-100 p-3 rounded-2xl text-sm mt-2 break-words"><b>${c.u}:</b> ${c.t}</div>`).join('');
-          let badge = type==='global' ? `<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full ml-2 border">${p.campus}</span>` : "";
-          
-          const div = document.createElement('div');
-          div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 animate-[slideUp_0.3s]";
-          // build avatar html
-          let avatarHtml;
-          if(p.avt && (p.avt.startsWith('http') || p.avt.startsWith('data:'))){
-              avatarHtml = `<img src="${p.avt}" class="w-12 h-12 rounded-full object-cover shrink-0">`;
-          } else {
-              avatarHtml = `<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-lg">${p.avt || ''}</div>`;
-          }
-          div.innerHTML = `
-            <div class="flex gap-4 mb-3">${avatarHtml}<div><h5 class="font-bold text-base text-slate-900 flex items-center">${p.user} ${badge}</h5><p class="text-xs text-slate-400">Vừa xong</p></div></div>
-            <p class="text-base text-slate-800 leading-relaxed break-words">${p.content}</p>${imgHtml}
-            <div class="flex gap-8 mt-4 pt-4 border-t border-slate-50 text-sm font-bold text-slate-500">
-                <button onclick="likePost(${p.id}, this)" class="hover:text-red-500 flex items-center gap-2 transition"><i class="fa-regular fa-heart text-xl"></i> <span id="like-count-${p.id}">${p.likes}</span></button>
-                <button onclick="toggleComment(${p.id})" class="hover:text-blue-500 flex items-center gap-2 transition"><i class="fa-regular fa-comment text-xl"></i> Bình luận</button>
-            </div>
-            <div id="cmt-box-${p.id}" class="hidden mt-4 pt-2 border-t border-slate-50">
-                <div id="cmt-list-${p.id}" class="space-y-2 mb-3">${commentsHtml}</div>
-                <div class="flex gap-3"><input id="cmt-input-${p.id}" class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-300 transition" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter') addComment(${p.id})"><button onclick="addComment(${p.id})" class="text-blue-600 font-bold text-sm px-3 hover:bg-blue-50 rounded-full">Gửi</button></div>
-            </div>`;
-          container.appendChild(div);
-      });
+      renderFilteredPosts(filtered, type);
+  }
+
+  // Helper function to render filtered posts
+  function renderFilteredPosts(filtered, type) {
+      const container = document.getElementById('social-feed');
+      
+      if (filtered.length === 0) {
+          // Show empty state
+          const emptyDiv = document.createElement('div');
+          emptyDiv.className = "text-center py-12 text-slate-400";
+          emptyDiv.innerHTML = `
+            <div class="text-6xl mb-4">📭</div>
+            <div class="text-lg font-medium">Chưa có bài đăng nào</div>
+            <div class="text-sm mt-2">${type === 'global' ? 'Hãy là người đầu tiên đăng bài toàn quốc!' : 'Hãy là người đầu tiên đăng bài tại ' + currentUser.campus + '!'}</div>
+          `;
+          container.appendChild(emptyDiv);
+      } else {
+          // Render posts instantly
+          filtered.forEach(p => {
+              let imgHtml = p.img ? `<img src="${p.img}" onclick="viewImage(this.src)" class="w-full h-auto max-h-[500px] object-cover rounded-2xl mt-4 mb-2 border border-slate-100 cursor-pointer">` : "";
+              let commentsHtml = p.cmts ? p.cmts.map(c => `<div class="bg-slate-100 p-3 rounded-2xl text-sm mt-2 break-words"><b>${c.u}:</b> ${c.t}</div>`).join('') : "";
+              let badge = type==='global' ? `<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full ml-2 border">${p.campus}</span>` : "";
+              
+              const div = document.createElement('div');
+              div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 mb-4";
+              
+              // build avatar html
+              let avatarHtml;
+              if(p.avt && (p.avt.startsWith('http') || p.avt.startsWith('data:'))){
+                  avatarHtml = `<img src="${p.avt}" class="w-12 h-12 rounded-full object-cover shrink-0">`;
+              } else {
+                  avatarHtml = `<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-lg">${p.avt || ''}</div>`;
+              }
+              
+              // Format time
+              const timeAgo = p.timestamp ? getTimeAgo(new Date(p.timestamp)) : 'Vừa xong';
+              
+              div.innerHTML = `
+                <div class="flex gap-4 mb-3">${avatarHtml}<div><h5 class="font-bold text-base text-slate-900 flex items-center">${p.user} ${badge}</h5><p class="text-xs text-slate-400">${timeAgo}</p></div></div>
+                <p class="text-base text-slate-800 leading-relaxed break-words">${p.content}</p>${imgHtml}
+                <div class="flex gap-8 mt-4 pt-4 border-t border-slate-50 text-sm font-bold text-slate-500">
+                    <button onclick="likePost(${p.id}, this)" class="hover:text-red-500 flex items-center gap-2 transition-colors duration-200"><i class="fa-regular fa-heart text-xl"></i> <span id="like-count-${p.id}">${p.likes || 0}</span></button>
+                    <button onclick="toggleComment(${p.id})" class="hover:text-blue-500 flex items-center gap-2 transition-colors duration-200"><i class="fa-regular fa-comment text-xl"></i> Bình luận</button>
+                </div>
+                <div id="cmt-box-${p.id}" class="hidden mt-4 pt-2 border-t border-slate-50">
+                    <div id="cmt-list-${p.id}" class="space-y-2 mb-3">${commentsHtml}</div>
+                    <div class="flex gap-3"><input id="cmt-input-${p.id}" class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-300 transition" placeholder="Viết bình luận..." onkeydown="if(event.key==='Enter') addComment(${p.id})"><button onclick="addComment(${p.id})" class="text-blue-600 font-bold text-sm px-3 hover:bg-blue-50 rounded-full transition-colors duration-200">Gửi</button></div>
+                </div>`;
+              container.appendChild(div);
+          });
+      }
+      
+      // Fade in
+      container.style.opacity = '1';
+  }
+
+  // Helper function to format time ago
+  function getTimeAgo(date) {
+      const seconds = Math.floor((new Date() - date) / 1000);
+      
+      if (seconds < 60) return 'Vừa xong';
+      if (seconds < 3600) return `${Math.floor(seconds / 60)} phút trước`;
+      if (seconds < 86400) return `${Math.floor(seconds / 3600)} giờ trước`;
+      if (seconds < 604800) return `${Math.floor(seconds / 86400)} ngày trước`;
+      
+      return date.toLocaleDateString('vi-VN');
   }
 
   function likePost(id, btn) {
       const p = posts.find(x => x.id === id);
       const icon = btn.querySelector('i');
       const span = btn.querySelector('span');
-      if (icon.classList.contains('fa-regular')) { icon.classList.replace('fa-regular', 'fa-solid'); btn.classList.add('text-red-500'); p.likes++; } 
-      else { icon.classList.replace('fa-solid', 'fa-regular'); btn.classList.remove('text-red-500'); p.likes--; }
+      if (icon.classList.contains('fa-regular')) { 
+          icon.classList.replace('fa-regular', 'fa-solid'); 
+          btn.classList.add('text-red-500'); 
+          p.likes++; 
+      } else { 
+          icon.classList.replace('fa-solid', 'fa-regular'); 
+          btn.classList.remove('text-red-500'); 
+          p.likes--; 
+      }
       span.innerText = p.likes;
+      
+      // Sync to Firestore
+      if (window.savePostToFirestore) {
+          window.savePostToFirestore(p);
+      }
+      
       saveHistory();
   }
   function toggleComment(id) { document.getElementById(`cmt-box-${id}`).classList.toggle('hidden'); }
@@ -1694,6 +1955,12 @@ document.addEventListener('keydown', e=>{
       newCmt.innerHTML = `<b>${currentUser.name}:</b> ${text}`;
       list.appendChild(newCmt);
       input.value = "";
+      
+      // Sync to Firestore
+      if (window.savePostToFirestore) {
+          window.savePostToFirestore(p);
+      }
+      
       saveHistory();
   }
   function addPost() {
@@ -1753,7 +2020,31 @@ document.addEventListener('keydown', e=>{
   function pushPost(txt, imgUrl, scope='local') {
       const avatarValue = currentUser.avatar || currentUser.name.charAt(0).toUpperCase();
       const campus = scope === 'global' ? 'All' : currentUser.campus;
-      posts.unshift({id:Date.now(), user:currentUser.name, avt:avatarValue, campus, scope, content:txt, img:imgUrl, likes:0, cmts:[]});
+      
+      // Create post object with timestamp
+      const postData = {
+        id: Date.now(),
+        user: currentUser.name,
+        avt: avatarValue,
+        campus: campus,
+        scope: scope,
+        content: txt,
+        img: imgUrl,
+        likes: 0,
+        cmts: [],
+        timestamp: new Date().toISOString(),
+        userId: currentUser.uid || 'anonymous'
+      };
+      
+      // Add to local array for immediate UI update
+      posts.unshift(postData);
+      
+      // Save to Firestore for persistence and sync
+      if (window.savePostToFirestore) {
+        window.savePostToFirestore(postData);
+      }
+      
+      // Reset form
       document.getElementById('post-content').value = "";
       if(document.getElementById('post-image')) {
           document.getElementById('post-image').value = "";
@@ -1765,6 +2056,7 @@ document.addEventListener('keydown', e=>{
       }
       if(document.getElementById('post-scope')) document.getElementById('post-scope').value = 'local';
       document.getElementById('post-modal').classList.add('hidden');
+      
       // refresh feed based on scope selected
       if(scope === 'global') filterFeed('global'); else filterFeed('local');
   }
@@ -3274,6 +3566,159 @@ document.addEventListener('keydown', e=>{
   window.addEventListener('load', () => {
       renderEisenhowerMatrix();
   });
+</script>
+
+<!-- 🔥 Firebase SDK v10 Modules -->
+<script type="module">
+  // Import Firebase SDK v10 modules - cách đúng
+  import { 
+    initializeApp 
+  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+  
+  import { 
+    getAuth,
+    GoogleAuthProvider,
+    signInWithPopup
+  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js';
+  
+  import { 
+    getFirestore, 
+    doc, 
+    setDoc, 
+    getDoc,
+    collection,
+    query,
+    orderBy,
+    onSnapshot,
+    getDocs
+  } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+
+  // Firebase Configuration - Đọc từ environment variables
+  const firebaseConfig = {
+    apiKey: window.FIREBASE_API_KEY || "",
+    authDomain: window.FIREBASE_AUTH_DOMAIN || "",
+    projectId: window.FIREBASE_PROJECT_ID || "",
+    storageBucket: window.FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: window.FIREBASE_APP_ID || "",
+    measurementId: window.FIREBASE_MEASUREMENT_ID || ""
+  };
+
+  // Initialize Firebase
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+  const db = getFirestore(app);
+
+  // Make Firebase instances available globally
+  window.firebaseAuth = auth;
+  window.firebaseDb = db;
+  window.GoogleAuthProvider = GoogleAuthProvider;
+  window.signInWithPopup = signInWithPopup;
+  window.doc = doc;
+  window.setDoc = setDoc;
+  window.getDoc = getDoc;
+  window.collection = collection;
+  window.query = query;
+  window.orderBy = orderBy;
+  window.onSnapshot = onSnapshot;
+  window.getDocs = getDocs;
+
+  // Community Firestore functions
+  window.communityPostsRef = null;
+  window.communityListener = null;
+
+  // Initialize community reference
+  window.initCommunity = function() {
+    window.communityPostsRef = window.collection(window.firebaseDb, 'community_posts');
+    console.log('🔄 Community Firestore initialized');
+  };
+
+  // Save post to Firestore
+  window.savePostToFirestore = async function(postData) {
+    try {
+      const postRef = window.doc(window.firebaseDb, 'community_posts', postData.id.toString());
+      await window.setDoc(postRef, postData);
+      console.log('💾 Post saved to Firestore:', postData.id);
+    } catch (error) {
+      console.error('❌ Error saving post to Firestore:', error);
+    }
+  };
+
+  // Load posts from Firestore
+  window.loadPostsFromFirestore = async function() {
+    try {
+      const q = window.query(window.communityPostsRef, window.orderBy('timestamp', 'desc'));
+      const querySnapshot = await window.getDocs(q);
+      const firestorePosts = [];
+      
+      querySnapshot.forEach((doc) => {
+        firestorePosts.push(doc.data());
+      });
+      
+      console.log('📥 Loaded posts from Firestore:', firestorePosts.length);
+      return firestorePosts;
+    } catch (error) {
+      console.error('❌ Error loading posts from Firestore:', error);
+      return [];
+    }
+  };
+
+  // Real-time listener for posts
+  window.startCommunityListener = function() {
+    if (window.communityListener) {
+      window.communityListener();
+    }
+    
+    window.communityListener = window.onSnapshot(
+      window.query(window.communityPostsRef, window.orderBy('timestamp', 'desc')),
+      (snapshot) => {
+        snapshot.docChanges().forEach((change) => {
+          if (change.type === 'added') {
+            console.log('🆕 New post detected:', change.doc.data());
+            // Refresh feed
+            if (typeof currentFeedType !== 'undefined' && currentFeedType) {
+              filterFeed(currentFeedType);
+            }
+          }
+        });
+      },
+      (error) => {
+        console.error('❌ Community listener error:', error);
+      }
+    );
+  };
+
+  console.log('🔥 Firebase v10 initialized successfully');
+  console.log('GoogleAuthProvider available:', typeof GoogleAuthProvider);
+  
+  // Auto-initialize community when Firebase is ready
+  setTimeout(() => {
+    if (window.initCommunity) {
+      window.initCommunity();
+      console.log('🚀 Community auto-initialized');
+    }
+  }, 1000);
+  
+  // Debug function to check Firebase status
+  window.checkFirebaseStatus = function() {
+    console.log('🔍 Firebase Status Check:');
+    console.log('- Firebase Auth:', typeof window.firebaseAuth);
+    console.log('- Firestore DB:', typeof window.firebaseDb);
+    console.log('- Collection:', typeof window.collection);
+    console.log('- Community Ref:', window.communityPostsRef);
+    console.log('- Save Function:', typeof window.savePostToFirestore);
+    console.log('- Load Function:', typeof window.loadPostsFromFirestore);
+    
+    // Test Firestore connection
+    if (window.firebaseDb && window.collection) {
+      try {
+        const testRef = window.collection(window.firebaseDb, 'test');
+        console.log('✅ Firestore connection test passed');
+      } catch (error) {
+        console.error('❌ Firestore connection test failed:', error);
+      }
+    }
+  };
 </script>
 </body>
 </html>
