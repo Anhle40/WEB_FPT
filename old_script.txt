@@ -1,0 +1,810 @@
+﻿
+> <script>
+    // --- DATA ---
+    const specs = {
+        'IT_FACULTY': [{code:'SE',name:'Kß╗╣ thuß║¡t phß║ºn mß╗üm (SE)'}, {code:'IA',name:'An to├án th├┤ng tin (IA)'}, {code:'AI',name:'Tr├¡ tuß╗ç nh├ón tß║ío (AI)'}, {code:'IC',name:'Vi mß║ích (IC)'}, 
+{code:'IoT',name:'Internet vß║ín vß║¡t (IoT)'}],
+        'BIZ_FACULTY': [{code:'IB',name:'Kinh doanh quß╗æc tß║┐ (IB)'}, {code:'MKT',name:'Digital Marketing'}, {code:'MC',name:'Truyß╗ün th├┤ng ─æa ph╞░╞íng tiß╗çn'}],
+        'LANG_FACULTY': [{code:'JAP',name:'Ng├┤n ngß╗» Nhß║¡t'}, {code:'KOR',name:'Ng├┤n ngß╗» H├án'}, {code:'ENG',name:'Ng├┤n ngß╗» Anh'}]
+    };
+  
+    const curriculumData = {
+        'IC': [ 
+            {name: "N─âm 1 - Kß╗│ 1", subs: [{c:"MAE101",n:"To├ín Kß╗╣ thuß║¡t",t:"hard",tip:"─Éß║ío h├ám, t├¡ch ph├ón phß║úi chß║»c.", diff:5, ref:"#"}, {c:"PHY101",n:"Vß║¡t l├╜ 1",t:"medium",tip:"C╞í, Nhiß╗çt.", 
+diff:4, ref:"#"}, {c:"JPD113",n:"Tiß║┐ng Nhß║¡t s╞í cß║Ñp",t:"medium",tip:"Hß╗ìc bß║úng chß╗» c├íi ngay.", diff:3, ref:"#"}]},
+  
+            {name: "N─âm 1 - Kß╗│ 2", subs: [{c:"PRF192",n:"Lß║¡p tr├¼nh C",t:"hard",tip:"Con trß╗Å l├á ├íc mß╗Öng."}, {c:"CEA201",n:"Kiß║┐n tr├║c m├íy t├¡nh",t:"medium",tip:"CPU, Memory."}, {c:"PHY102",n:"Vß║¡t l├╜ 
+2",t:"hard",tip:"─Éiß╗çn tß╗½ tr╞░ß╗¥ng."}]},
+            {name: "N─âm 2 - Kß╗│ 3", subs: [{c:"EE101",n:"Mß║ích ─æiß╗çn",t:"hard",tip:"─Éß╗ïnh luß║¡t Ohm."}, {c:"DLD101",n:"Thiß║┐t kß║┐ sß╗æ",t:"medium",tip:"Logic Gates."}]},
+            {name: "N─âm 2 - Kß╗│ 4", subs: [{c:"ECD201",n:"Mß║ích ─æiß╗çn tß╗¡",t:"hard",tip:"Transistor, MOSFET."}, {c:"SSG104",n:"T├¡n hiß╗çu hß╗ç thß╗æng",t:"hard",tip:"Fourier."}]},
+            {name: "N─âm 3 - Kß╗│ 5", subs: [{c:"ICD301",n:"IC Design Layout",t:"hard",tip:"Vß║╜ Layout chip."}, {c:"VER202",n:"Verilog HDL",t:"medium",tip:"Code phß║ºn cß╗⌐ng."}]},
+            {name: "N─âm 3 - Kß╗│ 6", subs: [{c:"DIC302",n:"Digital IC Design",t:"hard",tip:"Timing analysis."}, {c:"AIC303",n:"Analog IC Design",t:"hard",tip:"Si├¬u kh├│."}]},
+            {name: "N─âm 4 - Kß╗│ 7", subs: [{c:"OJT",n:"Thß╗▒c tß║¡p",t:"easy",tip:"─Éi l├ám doanh nghiß╗çp."}]},
+            {name: "N─âm 4 - Kß╗│ 8 & 9", subs: [{c:"CAPSTONE",n:"─Éß╗ô ├ín tß╗æt nghiß╗çp",t:"hard",tip:"L├ám chip thß╗▒c tß║┐."}]}
+        ],
+        'SE': [
+            {name: "Kß╗│ 1 (Nß╗ün tß║úng)", subs:[{c:"PRF192",n:"C Programming",t:"hard",tip:"Hß╗ìc kß╗╣ Pointer.", diff:4, ref:"#"},{c:"MAD101",n:"To├ín rß╗¥i rß║íc",t:"hard",tip:"Logic, Graph.", diff:5, ref:"#"}]},
+            {name: "Kß╗│ 3 (Chuy├¬n ng├ánh)", subs:[{c:"CSD201",n:"Data Structures",t:"hard",tip:"Thuß║¡t to├ín."},{c:"DBI202",n:"Database",t:"medium",tip:"SQL Server."}]}
+        ]
+    };
+  
+    // list of generic avatars (cartoon faces) users can be randomly assigned
+    const avatarList = [
+        "https://i.pravatar.cc/150?img=5",
+        "https://i.pravatar.cc/150?img=8",
+        "https://i.pravatar.cc/150?img=12",
+        "https://i.pravatar.cc/150?img=15",
+        "https://i.pravatar.cc/150?img=20"
+    ];
+  
+    let posts = [
+        { id: 1, user: "Minh Tuß║Ñn", avt: "https://i.pravatar.cc/150?img=5", campus: "─É├á Nß║╡ng", content: "Review C╞ím tß║Ñm 35k cß╗òng sau ─É├á Nß║╡ng: S╞░ß╗¥n to, c╞ím nhiß╗üu. 9/10 nh├⌐ ae!", img: 
+"https://images.unsplash.com/photo-1546069901-ba9599a7e63c?w=500", likes: 12, cmts: [{u:"Nam",t:"Xin ─æß╗ïa chß╗ë b├íc ╞íi"}] },
+        { id: 2, user: "Confession HN", avt: "https://i.pravatar.cc/150?img=8", campus: "H├á Nß╗Öi", content: "C├│ ai nhß║╖t ─æ╞░ß╗úc thß║╗ xe ß╗ƒ nh├á xe Beta Ho├á Lß║íc kh├┤ng ß║í? Cho em xin chuß╗Öc ≡ƒÿ¡", img: 
+"", likes: 5, cmts: [] },
+        { id: 3, user: "Hß║úi Yß║┐n", avt: "https://i.pravatar.cc/150?img=12", campus: "HCM", content: "Quß║¡n 9 chiß╗üu nay m╞░a to, c├íc bß║ín ─æi hß╗ìc nhß╗¢ mang ├ío m╞░a nh├⌐!", img: "", likes: 24, cmts: [] },
+        { id: 4, user: "Bß║úo Ngß╗ìc", avt: "https://i.pravatar.cc/150?img=15", campus: "Quy Nh╞ín", content: "AI Valley Quy Nh╞ín ─æß║╣p thß║¡t sß╗▒ c├íc b├íc ß║í ≡ƒÿì", img: 
+"https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=500", likes: 45, cmts: [] },
+        { id: 5, user: "Th├ánh ─Éß║ít", avt: "https://i.pravatar.cc/150?img=20", campus: "Cß║ºn Th╞í", content: "Cß║ºn t├¼m team ─æ├í b├│ng s├ón FPT Cß║ºn Th╞í chiß╗üu nay. Thiß║┐u 1 thß╗º m├┤n.", img: "", likes: 2, 
+cmts: [] },
+        { id: 6, user: "Linh ─Éan", avt: "https://i.pravatar.cc/150?img=25", campus: "─É├á Nß║╡ng", content: "C├│ ai biß║┐t review trung t├óm photocopy ß╗ƒ gß║ºn KTX B kh├┤ng? Cß║ºn photocopy b├ái tß║¡p th├┤i.", 
+img: "", likes: 8, cmts: [{u:"Mai",t:"C├│ tiß╗çm ß╗ƒ chß╗ú H├án ─æß╗º tiß╗çn"}] },
+        { id: 7, user: "Kh├ính Ph╞░╞íng", avt: "https://i.pravatar.cc/150?img=30", campus: "H├á Nß╗Öi", content: "S├íng nay thi PRF192, mß║Ñy bß║ín l├ám b├ái bao l├óu? ─Éß╗ü m├¼nh thß║Ñy kh├│ qua ≡ƒÑ║", img: "", 
+likes: 19, cmts: [{u:"T├║",t:"─Éß╗ü n├áy dß╗à h╞ín lß║ºn tr╞░ß╗¢c m├á"},{u:"Ph├ít",t:"M├¼nh 45 ph├║t xong"}] },
+        { id: 8, user: "Tuß║Ñn Anh", avt: "T", campus: "HCM", content: "Alert: Thß║╗ xe chiß╗üu nay bß╗ï h╞░, c├íc bß║ín nhß╗¢ c├│ thß║╗ dß╗▒ ph├▓ng hoß║╖c c├│ tiß╗ün lß║╗ ─æß╗â mua v├⌐ tß║ím thß╗¥i ≡ƒÜù", img: "", 
+likes: 34, cmts: [] },
+        { id: 9, user: "Minh Thu", avt: "https://i.pravatar.cc/150?img=22", campus: "Quy Nh╞ín", content: "Lß║ºn ─æß║ºu ti├¬n thß║Ñy b├¼nh minh ß╗ƒ cß║ºu cß║úng Quy Nh╞ín ≡ƒîà ─Éß║╣p qu├í, ai c┼⌐ng phß║úi ─æi xem 
+lß║ºn nß╗»a ß║í!", img: "https://images.unsplash.com/photo-1495888714795-8a5f62e5a6f4?w=500", likes: 78, cmts: [{u:"Nh╞░",t:"H├íng, phß║úi ─æi chiß╗üu nay"}] },
+        { id: 10, user: "Ho├áng Nam", avt: "https://i.pravatar.cc/150?img=18", campus: "Cß║ºn Th╞í", content: "Ai c├│ group chat m├┤n MAD101 kh├┤ng? Muß╗æn gia nhß║¡p ─æß╗â hß╗Åi b├ái chß║¡p chß╗⌐ng ≡ƒÿà", img: "", 
+likes: 11, cmts: [{u:"Duy├¬n",t:"C├│, tao mß╗¥i link"}] },
+        { id: 11, user: "Thanh H╞░╞íng", avt: "https://i.pravatar.cc/150?img=23", campus: "─É├á Nß║╡ng", content: "Mß║Ñy bß║ín c├│ sß╗¡ dß╗Ñng Notion ─æß╗â quß║ún l├╜ task kh├┤ng? Chia sß║╗ template vß╗¢i m├¼nh c├íi 
+nha ≡ƒô¥", img: "", likes: 15, cmts: [] },
+        { id: 12, user: "Quß╗æc Huy", avt: "Q", campus: "H├á Nß╗Öi", content: "Recruitment: Cß║ºn 2 backend developer cho startup. PM m├¼nh nß║┐u quan t├óm! Mß╗⌐c l╞░╞íng tß╗½ 8-12tr/th├íng.", img: "", likes: 42, 
+cmts: [{u:"S╞ín",t:"Gß╗¡i CV rß╗ôi"},] },
+        { id: 13, user: "B├¡ch Ng├ón", avt: "https://i.pravatar.cc/150?img=27", campus: "HCM", content: "Chuy├¬n ng├ánh g├¼ cß╗ºa FPT kh├│ nhß║Ñt? Nghe n├│i VLSI s├ít th╞░╞íng lß║»m ≡ƒÿ¿", img: "", likes: 56, cmts: 
+[{u:"H╞░ß╗¢ng",t:"VLSI kh├│ nh╞░ng th├¡ch hß╗úp vß╗¢i nhß╗»ng ai y├¬u th├¡ch thiß║┐t kß║┐"},{u:"Long",t:"IC Design c┼⌐ng kh├┤ng thua k├⌐m"}] },
+        { id: 14, user: "An Kh├┤i", avt: "https://i.pravatar.cc/150?img=35", campus: "Quy Nh╞ín", content: "H├┤m nay free, c├│ ai muß╗æn ─æi ch╞íi ß╗ƒ T├óy Nguy├¬n kh├┤ng? ≡ƒÅö∩╕Å", img: "", likes: 7, cmts: [] },
+        { id: 15, user: "Minh V┼⌐", avt: "https://i.pravatar.cc/150?img=28", campus: "Cß║ºn Th╞í", content: "Ai biß║┐t c├ích nß╗Öp hß╗ù trß╗ú khoß║úng 2 triß╗çu cho sinh vi├¬n kh├│ kh─ân? Vß╗½a mß╗¢i biß║┐t c├│ 
+ch╞░╞íng tr├¼nh n├áy ≡ƒñö", img: "", likes: 22, cmts: [{u:"Phi",t:"L├¬n ph├▓ng hß╗ìc sinh ph├▓ng l├ám viß╗çc ─æ├│ l├á c├│ danh s├ích"}] },
+        { id: 16, user: "─Éß╗⌐c Trung", avt: "https://i.pravatar.cc/150?img=33", campus: "─É├á Nß║╡ng", content: "Setup workspace tß║íi KTX xong! D├ón lß║¡p tr├¼nh m├á home office kh├┤ng c├│ monitor th├¼ to├ín 
+≡ƒûÑ∩╕Å≡ƒÿà", img: "https://images.unsplash.com/photo-1593642632823-8f785ba67e45?w=500", likes: 91, cmts: [{u:"Linh",t:"Workspace ─æß║╣p thiß╗çt"}] },
+        { id: 17, user: "FPTU Careers", avt: "https://i.pravatar.cc/150?img=40", campus: "All", scope: "global", content: "≡ƒÄë Tuy├¬n bß╗æ: H╞ín 500 sinh vi├¬n FPT ─æ╞░ß╗úc nhß║¡n viß╗çc l├ám sau tß╗æt nghiß╗çp 
+kß╗│ n├áy! Ch├║c mß╗½ng c├íc bß║ín! #fpt #career #hiring", img: "", likes: 234, cmts: [{u:"Minh",t:"Tuyß╗çt vß╗¥i!"},{u:"H├ón",t:"Mik c┼⌐ng nß║▒m trong con sß╗æ ─æ├│ ^^"}] },
+        { id: 18, user: "Tech Hub Vietnam", avt: "https://i.pravatar.cc/150?img=41", campus: "All", scope: "global", content: "Kh├│a hß╗ìc miß╗àn ph├¡: 'Mastering AI & Machine Learning' bß║»t ─æß║ºu tuß║ºn tß╗¢i! 
+D├ánh cho to├án bß╗Ö sinh vi├¬n FPT. Link ─æ─âng k├╜: fptu.edu.vn/ai-course", img: "", likes: 156, cmts: [{u:"Ph╞░╞íng",t:"Vß╗½a ─æ─âng k├╜ rß╗ôi"}] },
+        { id: 19, user: "FPT Scholarship", avt: "https://i.pravatar.cc/150?img=42", campus: "All", scope: "global", content: "Hß╗ìc bß╗òng To├án phß║ºn 2 n─âm cho sinh vi├¬n xuß║Ñt sß║»c kß╗│ n├áy. Hß║ín nß╗Öp: 
+28/2/2026. Y├¬u cß║ºu: GPA ΓëÑ 3.5, tham gia 2 hoß║ít ─æß╗Öng ngoß║íi kh├│a.", img: "", likes: 89, cmts: [{u:"Dung",t:"Sß║»p hß║┐t hß║ín rß╗ôi, mau nß╗Öp"}] },
+        { id: 20, user: "FPT Sports Club", avt: "https://i.pravatar.cc/150?img=43", campus: "All", scope: "global", content: "ΓÜ╜ Giß║úi b├│ng ─æ├í nß╗Öi bß╗Ö FPT 2026 - Bß║»t ─æß║ºu ─æ─âng k├╜! C├íc ─æß╗Öi tß╗½ 5 
+c╞í sß╗ƒ ─æ╞░ß╗úc ph├⌐p tham gia. Giß║úi nhß║Ñt: 20 triß╗çu VND ≡ƒÅå", img: "", likes: 127, cmts: [{u:"Tuß║Ñn",t:"─Éß╗úi ─æß╗Öi m├¼nh ─æ─âng k├╜"},{u:"H├▓a",t:"N─âm nay m├¼nh sß║╜ v├┤ ─æß╗ïch!"}] },
+        { id: 21, user: "FPT Life Magazine", avt: "https://i.pravatar.cc/150?img=44", campus: "All", scope: "global", content: "≡ƒôÜ B├ái viß║┐t: 'C├ón bß║▒ng cuß╗Öc sß╗æng sinh vi├¬n c├┤ng nghß╗ç' - Lß╗¥i khuy├¬n 
+tß╗½ c├íc mentor FPT. ─Éß╗ìc ─æß║ºy ─æß╗º tr├¬n blog FPT!", img: "", likes: 203, cmts: [{u:"Linh",t:"Useful tips!"},{u:"An",t:"Sß║╜ ├íp dß╗Ñng ngay"}] },
+        { id: 22, user: "FPT Community Events", avt: "https://i.pravatar.cc/150?img=45", campus: "All", scope: "global", content: "≡ƒÄ¬ Th├íng 3: Festival c├┤ng nghß╗ç to├án FPT - Hackathon, workshop, networking. 
+C├íc bß║ín sß║»p sß║╡n s├áng ch╞░a? ≡ƒÆ╗", img: "", likes: 178, cmts: [{u:"S╞ín",t:"Excited!"}] },
+        { id: 23, user: "Internship Hub", avt: "https://i.pravatar.cc/150?img=46", campus: "All", scope: "global", content: "≡ƒÆ╝ C╞í hß╗Öi internship: Google, Microsoft, Samsung mß╗ƒ ─æ╞ín tuyß╗ân ß╗⌐ng vi├¬n tß╗½ 
+FPT. Hß║ín chß║┐ chß╗ù, apply ASAP! ≡ƒÜÇ", img: "", likes: 312, cmts: [{u:"Ph├ít",t:"Vß╗½a submit application"},{u:"H╞░╞íng",t:"Ch├║c mß╗½ng bß║ín!"}] },
+        { id: 24, user: "Mental Health Support", avt: "https://i.pravatar.cc/150?img=47", campus: "All", scope: "global", content: "≡ƒºá T├óm l├╜ hß╗ìc vi├¬n: Thi cß╗¡, ├íp lß╗▒c tiß╗ün bß║íc, mß╗æi quan hß╗ç... 
+H├úy t├¼m ─æß║┐n ph├▓ng ─Éo├án-Hß╗Öi ─æß╗â ─æ╞░ß╗úc t╞░ vß║Ñn miß╗àn ph├¡! Lu├┤n sß║╡n s├áng lß║»ng nghe. ≡ƒÆÖ", img: "", likes: 256, cmts: [{u:"Mai",t:"Cß║úm ╞ín FPT ─æ├ú quan t├óm"},] },
+        { id: 25, user: "FPT Alumni Success", avt: "https://i.pravatar.cc/150?img=48", campus: "All", scope: "global", content: "≡ƒîƒ Nh├ón vß║¡t tuß║ºn: Nguyß╗àn Minh Ph├ít - Cß╗▒u sinh vi├¬n FPT, hiß╗çn CTO tß║íi 
+Startup Unicorn Viß╗çt Nam. ─Éß╗ìc c├óu chuyß╗çn truyß╗ün cß║úm hß╗⌐ng cß╗ºa anh ß║Ñy!", img: "", likes: 445, cmts: [{u:"T├║",t:"Mß╗Ñc ti├¬u cß╗ºa tui"},{u:"Huyß╗ün",t:"Amazing!"}] }
+    ];
+  
+    let currentUser = { name: "", campus: "", faculty: "" }; 
+  
+  // ---- UNDO/REDO HISTORY ----
+  let historyStack = [];
+  let historyIndex = -1;
+  let currentFeedType = 'local';
+  
+  function saveHistory(){
+      const snapshot = {
+          posts: JSON.parse(JSON.stringify(posts)),
+          eisenhowerTasks: JSON.parse(JSON.stringify(eisenhowerTasks))
+      };
+      historyStack = historyStack.slice(0, historyIndex+1);
+      historyStack.push(snapshot);
+      historyIndex++;
+  }
+  
+  function applyHistory(snapshot){
+      posts = JSON.parse(JSON.stringify(snapshot.posts));
+      eisenhowerTasks = JSON.parse(JSON.stringify(snapshot.eisenhowerTasks));
+      renderEisenhowerMatrix();
+      filterFeed(currentFeedType);
+  }
+  
+  function undo(){
+      if(historyIndex > 0){
+          historyIndex--;
+          applyHistory(historyStack[historyIndex]);
+      }
+  }
+  function redo(){
+      if(historyIndex < historyStack.length - 1){
+          historyIndex++;
+          applyHistory(historyStack[historyIndex]);
+      }
+  }
+  
+  document.addEventListener('keydown', e=>{
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='z'){
+          e.preventDefault(); undo();
+      }
+      if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='y'){
+          e.preventDefault(); redo();
+      }
+  });
+  
+    // --- CORE FUNCTIONS (QUAN TRß╗îNG ─Éß╗é ─É─éNG NHß║¼P) ---
+    function handleLogin() {
+        const name = document.getElementById('fullname').value.trim();
+        const mssv = document.getElementById('mssv').value.trim();
+        if(name && mssv) {
+            currentUser.name = name; 
+            currentUser.campus = document.getElementById('campus').value; 
+            currentUser.faculty = document.getElementById('faculty').value;
+            // assign random avatar image
+            currentUser.avatar = avatarList[Math.floor(Math.random()*avatarList.length)];
+            
+            document.getElementById('welcome-name').innerText = name;
+            document.getElementById('welcome-campus').innerText = currentUser.campus;
+            // Cß║¡p nhß║¡t t├¬n tr├¬n header
+            const headerName = document.getElementById('header-username');
+            if(headerName) headerName.innerText = name;
+  
+            document.getElementById('welcome-faculty').innerText = document.getElementById('faculty').options[document.getElementById('faculty').selectedIndex].text;
+  
+            // update avatar displays (header + any user-avt-display elements)
+            const setAvatarElem = e => {
+                if(currentUser.avatar) {
+                    e.innerHTML = `<img src="${currentUser.avatar}" class="w-full h-full rounded-full object-cover">`;
+                } else {
+                    e.innerText = name.charAt(0).toUpperCase();
+                }
+            };
+            document.querySelectorAll('.user-avt-display').forEach(setAvatarElem);
+            const headerAvt = document.getElementById('user-avatar');
+            if(headerAvt) setAvatarElem(headerAvt);
+            
+            const localBadge = document.getElementById('local-badge');
+            if(localBadge) localBadge.innerText = currentUser.campus.substring(0,2).toUpperCase();
+            
+            const campusDisplay = document.getElementById('current-campus-display');
+            if(campusDisplay) campusDisplay.innerText = currentUser.campus;
+  
+            document.getElementById('login-screen').classList.add('hidden');
+            document.getElementById('main-app').classList.remove('hidden');
+            document.getElementById('main-app').classList.add('flex');
+            
+            switchView('home');
+            filterFeed('local');
+            // capture initial state
+            saveHistory();
+        } else { alert("Vui l├▓ng ─æiß╗ün ─æß╗º T├¬n v├á MSSV!"); }
+    }
+  
+    // --- NAVIGATION ---
+    function switchView(id) {
+        document.querySelectorAll('.view-section').forEach(e => {
+            e.classList.add('hidden-view'); e.classList.remove('active-view');
+        });
+        document.getElementById('view-' + id).classList.remove('hidden-view');
+        document.getElementById('view-' + id).classList.add('active-view');
+        
+        document.querySelectorAll('nav button').forEach(b => b.classList.remove('text-orange-600', 'bg-white', 'shadow-sm'));
+        const btn = document.getElementById('btn-' + (id==='home'?'home':id));
+        if(btn) btn.classList.add('text-orange-600', 'bg-white', 'shadow-sm');
+    }
+  
+    // --- BACK BUTTON ---
+    function handleBackButton() {
+        const views = ['home', 'community', 'tools-menu', 'chat', 'guide', 'wiki-select', 'wiki-roadmap', 'social'];
+        const currentView = views.find(v => !document.getElementById(v)?.classList.contains('hidden-view'));
+        
+        if(currentView === 'home') {
+            document.getElementById('main-app').classList.add('hidden');
+            document.getElementById('login-screen').classList.remove('hidden');
+        } else if(currentView === 'wiki-roadmap') {
+            switchView('wiki-select');
+        } else if(currentView === 'wiki-select' || currentView === 'social') {
+            switchView('community');
+        } else {
+            switchView('home');
+        }
+    }
+  
+    // --- WIKI FLOW ---
+    function openWikiSelection() {
+        const list = document.getElementById('wiki-spec-list'); list.innerHTML = "";
+        const options = specs[currentUser.faculty] || specs['IT_FACULTY'];
+        document.getElementById('wiki-faculty-name').innerText = document.getElementById('welcome-faculty').innerText;
+        
+        options.forEach(opt => {
+            list.innerHTML += `<div onclick="openWikiRoadmap('${opt.code}', '${opt.name}')" class="bg-white p-6 rounded-2xl border border-slate-200 cursor-pointer hover:border-orange-400 hover:shadow-md transition 
+flex justify-between items-center group"><span class="font-bold text-slate-700 text-lg group-hover:text-orange-600">${opt.name}</span><i class="fa-solid fa-arrow-right text-slate-300 group-hover:text-orange-600 
+text-xl"></i></div>`;
+        });
+        switchView('wiki-select');
+    }
+  
+    function openWikiRoadmap(code, name) {
+        const container = document.getElementById('wiki-list');
+        const data = curriculumData[code] || curriculumData['SE']; 
+        document.getElementById('roadmap-title').innerText = name;
+        container.innerHTML = "";
+        
+        // roadmap overview
+        container.innerHTML += `<div class="mb-6">
+            <h3 class="font-bold text-lg text-slate-800">Lß╗Ö tr├¼nh hß╗ìc tß║¡p</h3>
+            <ul class="list-disc list-inside text-slate-600">
+                <li><b>Kinh tß║┐:</b> ─Éß║íi c╞░╞íng ΓåÆ C╞í sß╗ƒ ng├ánh (Kinh tß║┐ vi m├┤/v─⌐ m├┤) ΓåÆ Chuy├¬n ng├ánh s├óu (T├ái ch├¡nh doanh nghiß╗çp, Marketing quß╗æc tß║┐).</li>
+                <li><b>C├┤ng nghß╗ç:</b> Lß║¡p tr├¼nh c─ân bß║ún (C/C++, Python) ΓåÆ Cß║Ñu tr├║c dß╗» liß╗çu & Giß║úi thuß║¡t ΓåÆ Chuy├¬n s├óu (Web, Mobile, AI).</li>
+            </ul>
+        </div>`;
+        
+        data.forEach(sem => {
+            let html = `<div class="relative"><div class="absolute -left-[41px] top-1 w-5 h-5 rounded-full bg-orange-500 border-4 border-white shadow-md"></div><h4 class="font-bold text-slate-800 mb-4 text-base 
+uppercase tracking-wider">${sem.name}</h4><div class="grid md:grid-cols-2 gap-4 mb-10">`;
+            sem.subs.forEach(sub => {
+                const diffStars = sub.diff ? 'Γÿà'.repeat(sub.diff) + 'Γÿå'.repeat(5-sub.diff) : '';
+                const refLink = sub.ref ? `<a href="${sub.ref}" target="_blank" class="text-xs text-blue-600 underline ml-2">T├ái liß╗çu</a>` : '';
+                html += `<div class="bg-slate-50 p-4 rounded-2xl border border-slate-200 hover:border-orange-300 transition cursor-pointer group hover:bg-white hover:shadow-sm"><div class="flex justify-between 
+items-start"><div><h4 class="font-bold text-slate-800 text-base group-hover:text-orange-600">${sub.c} - ${sub.n}</h4><p class="text-xs text-yellow-600 mt-1">${diffStars}</p><p class="text-sm text-slate-500 mt-1 
+leading-snug">${sub.tip}</p>${refLink}</div><span class="tag-${sub.t}">${sub.t.toUpperCase()}</span></div></div>`;
+            });
+            container.innerHTML += html + "</div></div>";
+        });
+        switchView('wiki-roadmap');
+    }
+  
+    // --- SOCIAL ---
+    function filterFeed(type) {
+        currentFeedType = type;
+        const container = document.getElementById('social-feed');
+        container.innerHTML = "";
+        
+        const btnLocal = document.getElementById('tab-local');
+        const btnGlobal = document.getElementById('tab-global');
+        const chatName = document.getElementById('chat-room-name');
+  
+        if(type==='local'){
+            btnLocal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
+            btnGlobal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
+            if(chatName) chatName.innerText = currentUser.campus; 
+        } else {
+            btnLocal.className = "px-6 py-2 rounded-full bg-white text-slate-600 text-sm font-bold hover:bg-slate-50 transition";
+            btnGlobal.className = "px-6 py-2 rounded-full bg-orange-100 text-orange-600 text-sm font-bold shadow-sm transition";
+            if(chatName) chatName.innerText = "To├án quß╗æc (5 Miß╗ün)";
+        }
+  
+        const filtered = posts.filter(p => {
+            const scope = p.scope || 'local'; // default older posts to local
+            if(type === 'global') return scope === 'global';
+            // local feed: only posts scoped local and matching campus
+            return scope === 'local' && p.campus === currentUser.campus;
+        });
+        
+        filtered.forEach(p => {
+            let imgHtml = p.img ? `<img src="${p.img}" onclick="viewImage(this.src)" class="w-full h-auto max-h-[500px] object-cover rounded-2xl mt-4 mb-2 border border-slate-100 cursor-pointer">` : "";
+            let commentsHtml = p.cmts.map(c => `<div class="bg-slate-100 p-3 rounded-2xl text-sm mt-2 break-words"><b>${c.u}:</b> ${c.t}</div>`).join('');
+            let badge = type==='global' ? `<span class="bg-slate-100 text-slate-500 text-[10px] px-2 py-0.5 rounded-full ml-2 border">${p.campus}</span>` : "";
+  
+            const div = document.createElement('div');
+            div.className = "bg-white p-6 rounded-3xl shadow-sm border border-slate-200 animate-[slideUp_0.3s]";
+            // build avatar html
+            let avatarHtml;
+            if(p.avt && (p.avt.startsWith('http') || p.avt.startsWith('data:'))){
+                avatarHtml = `<img src="${p.avt}" class="w-12 h-12 rounded-full object-cover shrink-0">`;
+            } else {
+                avatarHtml = `<div class="w-12 h-12 rounded-full bg-slate-200 flex items-center justify-center font-bold text-slate-600 text-lg">${p.avt || ''}</div>`;
+            }
+            div.innerHTML = `
+              <div class="flex gap-4 mb-3">${avatarHtml}<div><h5 class="font-bold text-base text-slate-900 flex items-center">${p.user} ${badge}</h5><p class="text-xs text-slate-400">Vß╗½a xong</p></div></div>
+              <p class="text-base text-slate-800 leading-relaxed break-words">${p.content}</p>${imgHtml}
+              <div class="flex gap-8 mt-4 pt-4 border-t border-slate-50 text-sm font-bold text-slate-500">
+                  <button onclick="likePost(${p.id}, this)" class="hover:text-red-500 flex items-center gap-2 transition"><i class="fa-regular fa-heart text-xl"></i> <span 
+id="like-count-${p.id}">${p.likes}</span></button>
+                  <button onclick="toggleComment(${p.id})" class="hover:text-blue-500 flex items-center gap-2 transition"><i class="fa-regular fa-comment text-xl"></i> B├¼nh luß║¡n</button>
+              </div>
+              <div id="cmt-box-${p.id}" class="hidden mt-4 pt-2 border-t border-slate-50">
+                  <div id="cmt-list-${p.id}" class="space-y-2 mb-3">${commentsHtml}</div>
+                  <div class="flex gap-3"><input id="cmt-input-${p.id}" class="flex-1 bg-slate-100 border-none rounded-full px-4 py-2 text-sm outline-none focus:ring-1 focus:ring-orange-300 transition" 
+placeholder="Viß║┐t b├¼nh luß║¡n..." onkeydown="if(event.key==='Enter') addComment(${p.id})"><button onclick="addComment(${p.id})" class="text-blue-600 font-bold text-sm px-3 hover:bg-blue-50 
+rounded-full">Gß╗¡i</button></div>
+              </div>`;
+            container.appendChild(div);
+        });
+    }
+  
+    function likePost(id, btn) {
+        const p = posts.find(x => x.id === id);
+        const icon = btn.querySelector('i');
+        const span = btn.querySelector('span');
+        if (icon.classList.contains('fa-regular')) { icon.classList.replace('fa-regular', 'fa-solid'); btn.classList.add('text-red-500'); p.likes++; } 
+        else { icon.classList.replace('fa-solid', 'fa-regular'); btn.classList.remove('text-red-500'); p.likes--; }
+        span.innerText = p.likes;
+        saveHistory();
+    }
+    function toggleComment(id) { document.getElementById(`cmt-box-${id}`).classList.toggle('hidden'); }
+    function addComment(id) {
+        const input = document.getElementById(`cmt-input-${id}`);
+        const text = input.value.trim();
+        if (!text) return;
+        const p = posts.find(x => x.id === id);
+        p.cmts.push({u: currentUser.name, t: text});
+        const list = document.getElementById(`cmt-list-${id}`);
+        const newCmt = document.createElement('div');
+        newCmt.className = "bg-slate-100 p-3 rounded-2xl text-sm mt-2 animate-[slideUp_0.2s] break-words";
+        newCmt.innerHTML = `<b>${currentUser.name}:</b> ${text}`;
+        list.appendChild(newCmt);
+        input.value = "";
+        saveHistory();
+    }
+    function addPost() {
+        const txt = document.getElementById('post-content').value.trim();
+        const scope = document.getElementById('post-scope').value || 'local';
+        if(!txt) return;
+        // read image if selected
+        const fileInput = document.getElementById('post-image');
+        let imgUrl = "";
+        const doPush = () => pushPost(txt, imgUrl, scope);
+        if(fileInput && fileInput.files && fileInput.files[0]) {
+            const file = fileInput.files[0];
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                imgUrl = e.target.result;
+                doPush();
+            };
+            reader.readAsDataURL(file);
+        } else {
+            doPush();
+        }
+    }
+  
+    // show preview on file selection inside modal
+    document.getElementById('post-image').addEventListener('change', function(){
+        if(this.files && this.files[0]){
+            const reader = new FileReader();
+            reader.onload = e => {
+                const preview = document.getElementById('post-image-preview');
+                preview.src = e.target.result;
+                document.getElementById('post-image-preview-container').classList.remove('hidden');
+            };
+            reader.readAsDataURL(this.files[0]);
+        } else {
+            const preview = document.getElementById('post-image-preview');
+            preview.src = '';
+            document.getElementById('post-image-preview-container').classList.add('hidden');
+        }
+    });
+    document.getElementById('post-image-preview').addEventListener('click', function(){
+        if(this.src) viewImage(this.src);
+    });
+  
+    function viewImage(url){
+        const iv=document.getElementById('image-viewer');
+        iv.querySelector('img').src=url;
+        iv.classList.remove('hidden');
+    }
+    function closeImageViewer(e){
+        e.stopPropagation();
+        const iv=document.getElementById('image-viewer');
+        iv.classList.add('hidden');
+        iv.querySelector('img').src='';
+    }
+    // clicking outside the image (on overlay) also closes
+    document.getElementById('image-viewer').addEventListener('click', closeImageViewer);
+    function pushPost(txt, imgUrl, scope='local') {
+        const avatarValue = currentUser.avatar || currentUser.name.charAt(0).toUpperCase();
+        const campus = scope === 'global' ? 'All' : currentUser.campus;
+        posts.unshift({id:Date.now(), user:currentUser.name, avt:avatarValue, campus, scope, content:txt, img:imgUrl, likes:0, cmts:[]});
+        document.getElementById('post-content').value = "";
+        if(document.getElementById('post-image')) {
+            document.getElementById('post-image').value = "";
+            // hide preview thumbnail when resetting
+            const previewCont = document.getElementById('post-image-preview-container');
+            if(previewCont) previewCont.classList.add('hidden');
+            const previewImg = document.getElementById('post-image-preview');
+            if(previewImg) previewImg.src = "";
+        }
+        if(document.getElementById('post-scope')) document.getElementById('post-scope').value = 'local';
+        document.getElementById('post-modal').classList.add('hidden');
+        // refresh feed based on scope selected
+        if(scope === 'global') filterFeed('global'); else filterFeed('local');
+    }
+  
+    // --- CALC & CHECK ---
+    function toggleModal(id) { document.getElementById('modal-' + id).classList.toggle('hidden'); }
+    
+    function calculate(){
+        const current = parseFloat(document.getElementById('calc-total').value);
+        const r = document.getElementById('calc-result');
+        const conv = document.getElementById('calc-convert');
+        // validate
+        if(isNaN(current) || current < 0 || current > 10){
+            r.innerHTML = `<span class="text-red-600 font-bold">─Éiß╗âm qu├í tr├¼nh kh├┤ng hß╗úp lß╗ç! (0-10)</span>`;
+            conv.innerHTML = '';
+            return;
+        }
+  
+        // formula: (current + final) / 2 >=5  => final = 10 - current
+        const finalNeeded = 10 - current;
+        let message = '';
+        if(finalNeeded > 10){
+            message = `<span class="text-red-600 font-bold">Toang rß╗ôi, hß╗ìc lß║íi th├┤i ≡ƒÿ¡</span>`;
+        } else if(finalNeeded <= 0){
+            message = `<span class="text-green-600 font-bold">─Éiß╗âm qu├í tr├¼nh cao, 0 ─æiß╗âm thi vß║½n pass nh╞░ng cß╗æ kiß║┐m ─æiß╗âm cao nh├⌐!</span>`;
+        } else {
+            message = `Cß║ºn thi Final ├¡t nhß║Ñt: <b>${finalNeeded.toFixed(1)}</b> ─æiß╗âm`;
+        }
+        r.innerHTML = message;
+  
+        // keep conversion table for reference
+        conv.innerHTML = `
+            <table class="w-full text-sm">
+                <tr><th class="text-left">─Éiß╗âm 10</th><th>Hß╗ç 4</th><th>Chß╗»</th></tr>
+                <tr><td>9-10</td><td>4.0</td><td>A</td></tr>
+                <tr><td>8-8.9</td><td>3.5</td><td>B</td></tr>
+                <tr><td>6.5-7.9</td><td>2.0</td><td>C</td></tr>
+                <tr><td>5-6.4</td><td>1.0</td><td>D</td></tr>
+                <tr><td><5</td><td>0.0</td><td>F</td></tr>
+            </table>`;
+    }
+  
+    function saveCalc(){
+        const total = document.getElementById('calc-total').value;
+        const history = JSON.parse(localStorage.getItem('calc_history')||'[]');
+        history.unshift({total,date:new Date().toLocaleString()});
+        localStorage.setItem('calc_history', JSON.stringify(history));
+        renderCalcHistory();
+    }
+    
+    function renderCalcHistory(){
+        const histDiv = document.getElementById('calc-history');
+        const history = JSON.parse(localStorage.getItem('calc_history')||'[]');
+        histDiv.innerHTML = history.map(h=>`<div class="border-b py-1 text-xs">${h.date}: ${h.total}</div>`).join('');
+    }
+    
+    
+    // persistence and notifications for deadlines
+    function saveEisenhowerTasks(){
+        localStorage.setItem('eisenhowerTasks', JSON.stringify(eisenhowerTasks));
+    }
+    function loadEisenhowerTasks(){
+        eisenhowerTasks = JSON.parse(localStorage.getItem('eisenhowerTasks')||'[]');
+    }
+    function requestNotificationPermission(){
+        if("Notification" in window && Notification.permission !== 'granted'){
+            Notification.requestPermission();
+        }
+    }
+    function checkDeadlines(){
+        if(!("Notification" in window) || Notification.permission !== 'granted') return;
+        const now = Date.now();
+        eisenhowerTasks.forEach(task=>{
+            if(task.due){
+                const diff = task.due - now;
+                if(diff <= 3*3600*1000 && !task.notified3h){
+                    new Notification(`≡ƒöö Deadline sß║»p tß╗¢i: ${task.name} c├▓n 3 giß╗¥`);
+                    task.notified3h = true;
+                    saveEisenhowerTasks();
+                }
+                if(diff <= 1*3600*1000 && !task.notified1h){
+                    new Notification(`≡ƒöö Deadline sß║»p tß╗¢i: ${task.name} c├▓n 1 giß╗¥`);
+                    task.notified1h = true;
+                    saveEisenhowerTasks();
+                }
+            }
+        });
+    }
+    window.addEventListener('load',()=>{ 
+        renderCalcHistory(); 
+        loadEisenhowerTasks();
+        renderEisenhowerMatrix();
+        requestNotificationPermission();
+        checkDeadlines();
+        setInterval(checkDeadlines, 60000);
+    });
+    
+    async function checkPrompt(){
+        const v = document.getElementById('prompt-input').value.trim();
+        const r = document.getElementById('prompt-res');
+        if(!v) return;
+        // loading animation text
+        r.innerHTML = `<span class="text-slate-400"><i class='fa-solid fa-spinner fa-spin'></i> ─Éang ph├ón t├¡ch v├á tß╗æi ╞░u prompt...</span>`;
+  
+        try {
+            const API_KEY = "AIzaSyDLN92oNAfjxPBGYa6FAfraJauaPvE_Zl8";
+            if (!API_KEY || API_KEY === "YOUR_CHECK_PROMPT_API_KEY_HERE") {
+                document.getElementById('prompt-res').innerHTML = `<span class="text-red-600 font-bold">ΓÜá∩╕Å API key ch╞░a ─æ╞░ß╗úc cß║Ñu h├¼nh trong file check-prompt.ts</span>`;
+                return;
+            }
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+  
+            const context = `Bß║ín l├á mß╗Öt chuy├¬n gia Prompt Engineering cß║Ñp cao. Nhiß╗çm vß╗Ñ cß╗ºa bß║ín l├á ─æ├ính gi├í v├á tß╗æi ╞░u h├│a c├óu lß╗çnh (prompt) m├á ng╞░ß╗¥i d├╣ng nhß║¡p v├áo.\nD╞░ß╗¢i ─æ├óy 
+l├á c├óu lß╗çnh cß╗ºa ng╞░ß╗¥i d├╣ng: ${v}.\nH├úy trß║ú lß╗¥i bß║▒ng m├ú HTML (kh├┤ng d├╣ng markdown) vß╗¢i cß║Ñu tr├║c 2 phß║ºn r├╡ r├áng:\n\nPhß║ºn 1: <b>≡ƒÆí ─É├ính gi├í nhanh:</b> ─É├ính gi├í ─æiß╗âm mß║ính, 
+─æiß╗âm yß║┐u cß╗ºa prompt n├áy (VD: thiß║┐u ngß╗» cß║únh, thiß║┐u vai tr├▓...). Trß║ú lß╗¥i thß║¡t ngß║»n gß╗ìn.\n\nPhß║ºn 2: <b>Γ£¿ Prompt tß╗æi ╞░u:</b> Viß║┐t lß║íi mß╗Öt prompt ho├án chß╗ënh, chuy├¬n nghiß╗çp 
+nhß║Ñt dß╗▒a tr├¬n ├╜ ─æß╗ïnh cß╗ºa ng╞░ß╗¥i d├╣ng, ├íp dß╗Ñng c├íc kß╗╣ thuß║¡t nh╞░ ─æß║╖t vai tr├▓ (Act as...), cung cß║Ñp context, v├á y├¬u cß║ºu format r├╡ r├áng.`;
+  
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+            });
+  
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error?.message || 'Lß╗ùi API');
+  
+            if (data.candidates && data.candidates[0].content) {
+                const reply = data.candidates[0].content.parts[0].text;
+                // D├╣ng markdown formatter ─æß╗â hiß╗ân thß╗ï ─æß║╣p
+                const formattedReply = window.formatMarkdownToHTML ? 
+                    window.formatMarkdownToHTML(reply) : 
+                    reply.replace(/\n/g, '<br>');
+                
+                r.innerHTML = formattedReply;
+            } else {
+                r.innerHTML = `<span class="text-red-600">Kh├┤ng nhß║¡n ─æ╞░ß╗úc phß║ún hß╗ôi hß╗úp lß╗ç tß╗½ AI.</span>`;
+            }
+        } catch (err) {
+            console.error(err);
+            r.innerHTML = `<span class="text-red-600 font-bold"><i class='fa-solid fa-triangle-exclamation'></i> Lß╗ùi: ${err.message || 'Mß║Ñt mß║íng hoß║╖c API'}</span>`;
+        }
+    }
+  
+   // --- CHATBOT ---
+    async function sendChat(optionalText = null) {
+        const inp = document.getElementById('chat-input');
+        const text = optionalText || inp.value.trim();
+        if (!text) return;
+  
+        const starters = document.getElementById('chat-starters');
+        if (starters) starters.style.display = 'none';
+        const box = document.getElementById('chat-messages');
+        // User Message
+        box.innerHTML += `<div class="flex gap-4 flex-row-reverse animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-orange-600 text-white flex items-center justify-center shrink-0 text-sm"><i 
+class="fa-solid fa-user"></i></div><div class="bg-orange-600 text-white p-4 rounded-3xl rounded-tr-none shadow text-base max-w-[85%] break-words">${text}</div></div>`;
+        inp.value = "";
+        box.scrollTop = box.scrollHeight;
+  
+        // Loading
+        const typingId = "typing-" + Date.now();
+        const typingDiv = document.createElement('div');
+        typingDiv.id = typingId;
+        typingDiv.className = "flex gap-4 mt-2";
+        typingDiv.innerHTML = `<div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 text-sm"><i class="fa-solid fa-robot"></i></div><div 
+class="bg-white border p-4 rounded-3xl rounded-tl-none text-sm typing-indicator"><span></span><span></span><span></span></div>`;
+        box.appendChild(typingDiv);
+        box.scrollTop = box.scrollHeight;
+  
+        try {
+            // ≡ƒô¥ D├╣ng API key tß╗½ file config
+            const API_KEY = "AIzaSyDLN92oNAfjxPBGYa6FAfraJauaPvE_Zl8";
+            if (!API_KEY || API_KEY === "YOUR_CHAT_AI_API_KEY_HERE") {
+                const box = document.getElementById('chat-messages');
+                box.innerHTML += `<div class="flex gap-4"><div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0"><i class="fa-solid fa-bug"></i></div><div 
+class="bg-red-50 border border-red-200 p-4 rounded-3xl text-red-700">ΓÜá∩╕Å API key ch╞░a ─æ╞░ß╗úc cß║Ñu h├¼nh trong file chat-ai.ts</div></div>`;
+                return;
+            }
+            const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${API_KEY}`;
+            
+            const context = `Bß║ín l├á trß╗ú l├╜ AI FPTU Survival Kit. H├úy trß║ú lß╗¥i th├ón thiß╗çn, hß╗»u ├¡ch cho sinh vi├¬n FPTU.\n\nC├óu hß╗Åi: ${text}`;
+  
+            const response = await fetch(API_URL, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ contents: [{ parts: [{ text: context }] }] })
+            });
+  
+            const data = await response.json();
+            document.getElementById(typingId).remove();
+  
+            if (!response.ok) throw new Error("Lß╗ùi API");
+  
+            if (data.candidates && data.candidates[0].content) {
+                const reply = data.candidates[0].content.parts[0].text;
+                // D├╣ng markdown formatter ─æß╗â hiß╗ân thß╗ï ─æß║╣p
+                const formattedReply = window.formatMarkdownToHTML ? 
+                    window.formatMarkdownToHTML(reply) : 
+                    reply.replace(/\n/g, '<br>');
+                
+                box.innerHTML += `<div class="flex gap-4 animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-gradient-to-r from-blue-600 to-cyan-500 flex items-center justify-center text-white shrink-0 
+text-sm"><i class="fa-solid fa-sparkles"></i></div><div class="bg-white border border-slate-200 p-4 rounded-3xl rounded-tl-none text-slate-700 shadow-sm max-w-[85%] leading-relaxed text-base 
+break-words">${formattedReply}</div></div>`;
+            }
+  
+        } catch (error) {
+            if(document.getElementById(typingId)) document.getElementById(typingId).remove();
+            box.innerHTML += `<div class="flex gap-4 animate-[slideUp_0.3s]"><div class="w-10 h-10 rounded-full bg-red-500 text-white flex items-center justify-center shrink-0 text-sm"><i class="fa-solid 
+fa-bug"></i></div><div class="bg-red-50 border border-red-200 p-4 rounded-3xl rounded-tl-none text-red-700 shadow max-w-[85%] break-words"><b>Lß╗ùi:</b> Mß║íng yß║┐u hoß║╖c hß║┐t tiß╗ün API rß╗ôi huhu!</div></div>`;
+        }
+        box.scrollTop = box.scrollHeight;
+    }
+  
+    // --- GROUP CHAT ---
+    function toggleGroupChat() {
+        const box = document.getElementById('group-chat-box');
+        if (box.classList.contains('translate-y-full')) { box.classList.remove('translate-y-full'); } else { box.classList.add('translate-y-full'); }
+    }
+    function sendGroupChat() {
+        const inp = document.getElementById('group-chat-input');
+        const txt = inp.value.trim();
+        if(!txt) return;
+        const box = document.getElementById('group-chat-msgs');
+        const div = document.createElement('div');
+        div.className = "flex justify-end animate-[slideUp_0.2s]"; // group chat outgoing container
+        div.innerHTML = `<div class="bg-indigo-600 text-white px-4 py-2 rounded-2xl rounded-tr-none text-sm max-w-[80%] shadow-sm break-words">${txt}</div>`;
+        box.appendChild(div);
+        inp.value = "";
+        box.scrollTop = box.scrollHeight;
+        
+        setTimeout(() => {
+            const replyDiv = document.createElement('div');
+            replyDiv.className = "flex justify-start animate-[slideUp_0.2s]";
+            replyDiv.innerHTML = `<div class="bg-white border border-slate-200 px-4 py-2 rounded-2xl rounded-tl-none text-sm max-w-[80%] shadow-sm break-words"><span class="text-[10px] font-bold text-indigo-600 
+block mb-0.5">Minh</span>Thß║┐ ├á? Hay qu├í!</div>`;
+            box.appendChild(replyDiv);
+            box.scrollTop = box.scrollHeight;
+        }, 2000);
+    }
+  
+    // --- EISENHOWER MATRIX ---
+    let eisenhowerTasks = [];
+    let currentImportance = null;
+    let currentUrgency = null;
+  
+    function setEisenhowerImportance(isImportant) {
+        currentImportance = isImportant;
+        // Update buttons
+        const btn0 = document.getElementById('imp-btn-0');
+        const btn1 = document.getElementById('imp-btn-1');
+        if (isImportant === false) {
+            btn0.classList.add('bg-slate-200', 'border-slate-500', 'text-slate-800');
+            btn1.classList.remove('bg-blue-100', 'border-blue-500', 'text-blue-700');
+            btn1.classList.add('border-slate-300', 'text-slate-700');
+        } else {
+            btn0.classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+            btn0.classList.add('border-slate-300', 'text-slate-700');
+            btn1.classList.add('bg-blue-100', 'border-blue-500', 'text-blue-700');
+            btn1.classList.remove('border-slate-300', 'text-slate-700');
+        }
+    }
+  
+    function setEisenhowerUrgency(isUrgent) {
+        currentUrgency = isUrgent;
+        // Update buttons
+        const btn0 = document.getElementById('urg-btn-0');
+        const btn1 = document.getElementById('urg-btn-1');
+        if (isUrgent === false) {
+            btn0.classList.add('bg-slate-200', 'border-slate-500', 'text-slate-800');
+            btn1.classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+            btn1.classList.add('border-slate-300', 'text-slate-700');
+        } else {
+            btn0.classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+            btn0.classList.add('border-slate-300', 'text-slate-700');
+            btn1.classList.add('bg-red-100', 'border-red-500', 'text-red-700');
+            btn1.classList.remove('border-slate-300', 'text-slate-700');
+        }
+    }
+  
+    function addEisenhowerTask() {
+        const nameInput = document.getElementById('task-input-name');
+        const deadlineInput = document.getElementById('task-input-deadline');
+        const taskName = nameInput.value.trim();
+        const deadline = deadlineInput.value ? new Date(deadlineInput.value).getTime() : null;
+        
+        if (!taskName) {
+            alert('Vui l├▓ng nhß║¡p t├¬n c├┤ng viß╗çc!');
+            return;
+        }
+        
+        if (currentImportance === null || currentUrgency === null) {
+            alert('Vui l├▓ng chß╗ìn mß╗⌐c ─æß╗Ö quan trß╗ìng v├á gß║Ñp g├íp!');
+            return;
+        }
+        
+        const task = {
+            id: Date.now(),
+            name: taskName,
+            important: currentImportance,
+            urgent: currentUrgency,
+            createdAt: new Date().toLocaleDateString('vi-VN'),
+            due: deadline,
+            notified3h: false,
+            notified1h: false
+        };
+        
+        eisenhowerTasks.push(task);
+        saveEisenhowerTasks();
+        
+        // Clear input
+        nameInput.value = '';
+        deadlineInput.value = '';
+        currentImportance = null;
+        currentUrgency = null;
+        
+        // Reset buttons
+        document.getElementById('imp-btn-0').classList.add('border-slate-300', 'text-slate-700');
+        document.getElementById('imp-btn-0').classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+        document.getElementById('imp-btn-1').classList.remove('bg-blue-100', 'border-blue-500', 'text-blue-700');
+        document.getElementById('imp-btn-1').classList.add('border-slate-300', 'text-slate-700');
+        document.getElementById('urg-btn-0').classList.add('border-slate-300', 'text-slate-700');
+        document.getElementById('urg-btn-0').classList.remove('bg-slate-200', 'border-slate-500', 'text-slate-800');
+        document.getElementById('urg-btn-1').classList.remove('bg-red-100', 'border-red-500', 'text-red-700');
+        document.getElementById('urg-btn-1').classList.add('border-slate-300', 'text-slate-700');
+        
+        renderEisenhowerMatrix();
+        checkDeadlines();
+        saveHistory();
+    }
+  
+    function deleteEisenhowerTask(id) {
+        eisenhowerTasks = eisenhowerTasks.filter(t => t.id !== id);
+        saveEisenhowerTasks();
+        renderEisenhowerMatrix();
+    }
+  
+    function renderEisenhowerMatrix() {
+        // Clear all quadrants
+        ['quad-1', 'quad-2', 'quad-3', 'quad-4'].forEach(qid => {
+            document.getElementById(qid).innerHTML = '';
+        });
+        
+        eisenhowerTasks.forEach(task => {
+            let quadId;
+            if (task.urgent && task.important) {
+                quadId = 'quad-1';
+            } else if (!task.urgent && task.important) {
+                quadId = 'quad-2';
+            } else if (task.urgent && !task.important) {
+                quadId = 'quad-3';
+            } else {
+                quadId = 'quad-4';
+            }
+            
+            const taskEl = document.createElement('div');
+            taskEl.className = 'bg-white border-l-4 border-slate-400 rounded-lg p-3 flex justify-between items-start gap-2 shadow-sm hover:shadow-md transition';
+            
+            // Determine border color
+            if (quadId === 'quad-1') {
+                taskEl.classList.add('border-l-red-500', 'bg-red-50');
+            } else if (quadId === 'quad-2') {
+                taskEl.classList.add('border-l-blue-500', 'bg-blue-50');
+            } else if (quadId === 'quad-3') {
+                taskEl.classList.add('border-l-yellow-500', 'bg-yellow-50');
+            } else {
+                taskEl.classList.add('border-l-slate-400', 'bg-slate-50');
+            }
+            
+            taskEl.innerHTML = `
+                <div class="flex-1">
+                    <p class="font-semibold text-slate-800 text-sm">${task.name}</p>
+                    <p class="text-xs text-slate-500 mt-1">${task.createdAt}</p>
+                </div>
+                <button onclick="deleteEisenhowerTask(${task.id})" class="text-red-500 hover:bg-red-100 p-1.5 rounded transition flex-shrink-0">
+                    <i class="fa-solid fa-trash text-sm"></i>
+                </button>
+            `;
+            
+            document.getElementById(quadId).appendChild(taskEl);
+        });
+        
+        // Show empty state if no tasks
+        ['quad-1', 'quad-2', 'quad-3', 'quad-4'].forEach(qid => {
+            if (document.getElementById(qid).children.length === 0) {
+                const emptyEl = document.createElement('div');
+                emptyEl.className = 'text-center text-slate-400 text-sm py-8';
+                emptyEl.innerText = 'Ch╞░a c├│ c├┤ng viß╗çc';
+                document.getElementById(qid).appendChild(emptyEl);
+            }
+        });
+    }
+  
+    // Initialize Eisenhower on load
+    window.addEventListener('load', () => {
+        renderEisenhowerMatrix();
+    });
+  </script>
+  </body>
+  </html>
+
+
