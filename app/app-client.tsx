@@ -21,30 +21,7 @@ export default function AppClient() {
     (window as any).FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '';
     (window as any).FIREBASE_DATABASE_URL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || '';
     
-    // 🚀 Thêm navigation link để test React chat
-    const navButton = document.createElement('div');
-    navButton.innerHTML = `
-      <div style="position: fixed; top: 20px; right: 20px; z-index: 9999;">
-        <a href="/chat" style="
-          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-          color: white;
-          padding: 12px 24px;
-          border-radius: 25px;
-          text-decoration: none;
-          font-weight: bold;
-          box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
-          transition: all 0.3s ease;
-          display: inline-flex;
-          align-items: center;
-          gap: 8px;
-        " onmouseover="this.style.transform='translateY(-2px)'" onmouseout="this.style.transform='translateY(0)'">
-          <i class="fas fa-robot"></i>
-          <span>React Chat</span>
-        </a>
-      </div>
-    `;
-    document.body.appendChild(navButton);
-  }, []);
+      }, []);
 
   return (
     <div style={{ width: '100%', height: '100vh', margin: 0, padding: 0, overflow: 'hidden' }}>

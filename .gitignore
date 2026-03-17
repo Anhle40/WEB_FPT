@@ -12,6 +12,7 @@ node_modules/
 
 # 🔥 Security - API Keys
 .env.local
+.env.example
 .env.production
 .env.development
 firebase-config.json

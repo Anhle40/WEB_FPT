@@ -17,8 +17,8 @@ import {
 export class OpenRouterService {
   private static readonly DEFAULT_CONFIG: Partial<AIServiceConfig> = {
     model: 'google/gemini-2.5-flash-lite',
-    maxTokens: 1500,
-    temperature: 0.7,
+    maxTokens: 250,        // Giảm từ 1500 để tiết kiệm chi phí
+    temperature: 0.7,      // Giữ nguyên 0.7
     timeout: 30000, // 30 seconds
     baseURL: 'https://openrouter.ai/api/v1'
   };

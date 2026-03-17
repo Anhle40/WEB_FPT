@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server';
 
 export async function POST(request: NextRequest) {
   try {
-    const { prompt, model = 'google/gemini-2.5-flash-lite', max_tokens = 400, temperature = 0.3 } = await request.json();
+    const { prompt, model = 'google/gemini-2.5-flash-lite', max_tokens = 600, temperature = 0.3 } = await request.json();
 
     // Lấy API key từ environment variable (server-side only)
     const apiKey = process.env.OPENROUTER_API_KEY;
@@ -17,7 +17,21 @@ export async function POST(request: NextRequest) {
     const messages = [
       {
         role: 'system',
-        content: 'Bạn là một chuyên gia Prompt Engineering cấp cao. Nhiệm vụ của bạn là đánh giá và tối ưu hóa câu lệnh (prompt) mà người dùng nhập vào. Hãy trả lời bằng mã HTML (không dùng markdown) với cấu trúc 2 phần rõ ràng: Phần 1: 💡 Đánh giá nhanh: Đánh giá điểm mạnh, điểm yếu của prompt này (VD: thiếu ngữ cảnh, thiếu vai trò...). Trả lời thật ngắn gọn. Phần 2: ✨ Prompt tối ưu: Viết lại một prompt hoàn chỉnh, chuyên nghiệp nhất dựa trên ý định của người dùng, áp dụng các kỹ thuật như đặt vai trò (Act as...), cung cấp context, và yêu cầu format rõ ràng.'
+        content: `Bạn là một chuyên gia Prompt Engineering cấp cao. Nhiệm vụ của bạn là đánh giá và tối ưu hóa câu lệnh (prompt) mà người dùng nhập vào.
+
+Dưới đây là câu lệnh của người dùng: ${prompt}
+
+Hãy trả lời bằng MÃ HTML VỚI CẤU TRÚC 2 PHẦN RÕ RÀNG:
+
+Phần 1: <b>💡 Đánh giá nhanh:</b> Đánh giá điểm mạnh, điểm yếu của prompt này (VD: thiếu ngữ cảnh, thiếu vai trò...). Trả lời thật ngắn gọn.
+
+Phần 2: <b>✨ Prompt tối ưu:</b> Viết lại một prompt hoàn chỉnh, chuyên nghiệp nhất dựa trên ý định của người dùng, áp dụng các kỹ thuật như đặt vai trò (Act as...), cung cấp context, và yêu cầu format rõ ràng.
+
+QUAN TRỌNG:
+- KHÔNG dùng markdown (\`\`\`html, \`\`\`)
+- KHÔNG dùng code blocks
+- Trả lời thẳng HTML content
+- Dùng <b> cho bold, <br> cho xuống dòng`
       },
       {
         role: 'user',
@@ -50,7 +64,21 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    return NextResponse.json(data);
+    // Clean response - remove any code blocks if present
+    let content = data.choices?.[0]?.message?.content || '';
+    content = content.replace(/```html\n?/g, '').replace(/```\n?/g, '').trim();
+
+    return NextResponse.json({
+      choices: [
+        {
+          message: {
+            role: 'assistant',
+            content: content
+          }
+        }
+      ],
+      usage: data.usage
+    });
 
   } catch (error) {
     console.log('💥 Prompt Check Error:', error);

@@ -1,11 +1,15 @@
 // 🤖 Client-side API functions - Không expose API key
 // Sử dụng Next.js API routes để bảo mật
 
+// Global conversation context để tránh lặp lại
+let conversationHistory = [];
+
 // Chat API function
 async function sendChatMessage(userMessage) {
   try {
     console.log('🚀 Sending chat request to API route...');
     
+    // Chỉ gửi user message - system prompt sẽ được xử lý ở server
     const response = await fetch('/api/chat', {
       method: 'POST',
       headers: {
@@ -15,7 +19,28 @@ async function sendChatMessage(userMessage) {
         messages: [
           {
             role: 'system',
-            content: 'Bạn là trợ lý AI FPTU Survival Kit. Hãy trả lời NGẮN GỌN, XÚC TÍCH, DỄ HIỂU (dưới 100 từ). Tập trung vào giải pháp thực tế cho sinh viên FPTU. Trả lời như người bạn thân thiện, không dùng câu quá trang trọng.'
+            content: `Bạn là "FPTU Survival AI" - đàn anh/đàn chị khóa trên xuất sắc, am hiểu mọi ngóc ngách FPTU. Nhiệm vụ tư vấn cho tân sinh viên chính xác, ngắn gọn, thực tế.
+
+FPTU DICTIONARY (BẮT BUỘC):
+- MAD/MAD101: Toán rời rạc (KHÔNG phải lập trình di động)
+- PRF/PRF192: Lập trình C cơ bản (rất khó, hay rớt)
+- PRO/PRO192: Lập trình hướng đối tượng Java
+- CEA/CEA201: Kiến trúc máy tính
+- MAE/MAC: Toán giải tích, đại số tuyến tính
+- NWC/CSI: Mạng máy tính/Cơ sở CNTT
+- LUK: Little UK (học tiếng Anh theo mức độ)
+- FAP: FPT Academic Portal (điểm, lịch học)
+- EduNext: nền tảng học tập đánh giá chéo
+- PE: Practical Exam (thi thực hành, điểm liệt 4.0)
+- FE: Final Exam (thi lý thuyết, điểm liệt 4.0)
+- PT: Progress Test (kiểm tra quá trình)
+
+QUY TẮC TRẢ LỜI:
+1. THẲNG VÀO VẤN ĐỀ, không vòng vo
+2. Gạch đầu dòng ngắn gọn
+3. Giọng thân thiện: "bác", "bro", "bạn", "mình", "ae"
+4. Nếu mã môn lạ: hỏi lại "Môn này tên tiếng Anh/đầy đủ là gì hả bro?"
+5. TUYỆT ĐỐI KHÔNG BỊA ĐẶT KIẾN THỨC`
           },
           {
             role: 'user',
@@ -23,7 +48,7 @@ async function sendChatMessage(userMessage) {
           }
         ],
         model: 'google/gemini-2.5-flash-lite',
-        max_tokens: 300,
+        max_tokens: 250,
         temperature: 0.7
       })
     });
@@ -60,7 +85,7 @@ async function checkPrompt(prompt) {
       body: JSON.stringify({
         prompt,
         model: 'google/gemini-2.5-flash-lite',
-        max_tokens: 400,
+        max_tokens: 600,
         temperature: 0.3
       })
     });
@@ -71,6 +96,7 @@ async function checkPrompt(prompt) {
       throw new Error(data.error || 'API request failed');
     }
 
+    // Return HTML content directly
     if (data.choices && data.choices[0] && data.choices[0].message) {
       return data.choices[0].message.content;
     } else {
@@ -85,4 +111,4 @@ async function checkPrompt(prompt) {
 
 // Export để dùng trong browser
 window.sendChatMessage = sendChatMessage;
-window.checkPrompt = checkPrompt;
+window.sendPromptCheck = checkPrompt;

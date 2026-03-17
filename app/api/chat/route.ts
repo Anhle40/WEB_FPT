@@ -1,57 +1,51 @@
 import { NextRequest, NextResponse } from 'next/server';
+import { generateConversationResponse } from '../../../api-services/openrouter-service';
+import { OpenRouterMessage } from '../../../types/openrouter';
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, model = 'google/gemini-2.5-flash-lite', max_tokens = 300, temperature = 0.7 } = await request.json();
+    const body = await request.json();
+    const { messages, model = 'google/gemini-2.5-flash-lite', max_tokens = 250, temperature = 0.7 } = body;
 
-    // Lấy API key từ environment variable (server-side only)
-    const apiKey = process.env.OPENROUTER_API_KEY;
-    
-    if (!apiKey || !apiKey.startsWith('sk-or-')) {
+    if (!messages || !Array.isArray(messages)) {
       return NextResponse.json(
-        { error: 'API key không hợp lệ hoặc thiếu' },
+        { error: 'Messages array is required' },
+        { status: 400 }
+      );
+    }
+
+    // Không thêm system prompt ở đây - đã có trong api-client.js
+    // Điều này tránh lặp lại và đảm bảo consistency
+
+    const response = await generateConversationResponse(messages as OpenRouterMessage[], {
+      model,
+      maxTokens: max_tokens,
+      temperature
+    });
+
+    if (!response.success) {
+      return NextResponse.json(
+        { error: response.error || 'Failed to generate response' },
         { status: 500 }
       );
     }
 
-    console.log('🚀 Server-side API call...');
-    console.log('🔑 API Key format:', apiKey.substring(0, 15) + '...');
-    console.log('🎯 Model:', model);
-
-    const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${apiKey}`,
-        'HTTP-Referer': 'https://fptu-survival-kit.vercel.app',
-        'X-Title': 'FPTU Survival Kit'
-      },
-      body: JSON.stringify({
-        model,
-        messages,
-        max_tokens,
-        temperature
-      })
+    return NextResponse.json({
+      choices: [
+        {
+          message: {
+            role: 'assistant',
+            content: response.content
+          }
+        }
+      ],
+      usage: response.usage
     });
 
-    const data = await response.json();
-    console.log('📊 Response status:', response.status);
-
-    if (!response.ok) {
-      console.log('❌ API Error:', data);
-      return NextResponse.json(
-        { error: `API Error ${response.status}: ${data.error?.message || data.message || 'Unknown error'}` },
-        { status: response.status }
-      );
-    }
-
-    console.log('✅ API Success');
-    return NextResponse.json(data);
-
   } catch (error) {
-    console.log('💥 Server Error:', error);
+    console.error('Chat API Error:', error);
     return NextResponse.json(
-      { error: error instanceof Error ? error.message : 'Internal server error' },
+      { error: 'Internal server error' },
       { status: 500 }
     );
   }
