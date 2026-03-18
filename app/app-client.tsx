@@ -4,21 +4,13 @@ import { useEffect } from 'react';
 
 export default function AppClient() {
   useEffect(() => {
-    // 🔐 Chỉ set Firebase config (public config - an toàn)
-    // KHÔNG set OpenRouter API key ra frontend!
-    (window as any).NEXT_PUBLIC_FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET = process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID = process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_APP_ID = process.env.NEXT_PUBLIC_FIREBASE_APP_ID || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_DATABASE_URL = process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL || '';
-    (window as any).NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID = process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || '';
+    // 🔐 KHÔNG set bất kỳ API key nào ra frontend!
+    // Firebase config sẽ được đọc trực tiếp từ environment khi cần
     
-    // Debug: Log API key status
+    // Debug: Log status
     console.log('🔑 Environment API Keys Status:');
     console.log('- OpenRouter: ❌ Hidden for security');
-    console.log('- Firebase:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✅ Found' : '❌ Missing');
+    console.log('- Firebase: ✅ Using environment variables');
     
   }, []);
 
