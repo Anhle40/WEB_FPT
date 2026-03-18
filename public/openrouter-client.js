@@ -1,18 +1,15 @@
 // 🛡️ OpenRouter API Client - AN TOÀN TUYỆT ĐỐI
-// File này không chứa API key - chỉ đọc từ environment
+// File này không chứa API key - chỉ sử dụng Backend API
 
 class OpenRouterClient {
     constructor() {
-        // 🔐 Đọc API key từ environment variables
-        this.apiKey = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
-        this.baseURL = 'https://openrouter.ai/api/v1';
+        // 🔐 KHÔNG ĐỌC API KEY TỪ FRONTEND
+        // Sẽ sử dụng Backend API routes thay vì direct API calls
+        this.apiKey = ''; // Rỗng - không sử dụng trực tiếp
+        this.baseURL = '/api'; // Sẽ gọi backend API thay vì OpenRouter trực tiếp
         
-        // 🛡️ Kiểm tra API key
-        if (!this.apiKey) {
-            console.error('❌ OpenRouter API Key không được cấu hình!');
-            console.error('📝 Hãy thêm vào file .env.local:');
-            console.error('   NEXT_PUBLIC_OPENROUTER_API_KEY=your_api_key_here');
-        }
+        // 🛡️ Info
+        console.log('🔐 OpenRouter Client: Using Backend API for security');
     }
 
     // ✅ Kiểm tra API key có hợp lệ không

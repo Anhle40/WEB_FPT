@@ -4,11 +4,8 @@ import { useEffect } from 'react';
 
 export default function AppClient() {
   useEffect(() => {
-    // 🔐 Set API keys từ environment variable vào window object
-    // để HTML inline script có thể truy cập
-    (window as any).NEXT_PUBLIC_OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
-    
-    //  Set Firebase config cho HTML
+    // 🔐 Chỉ set Firebase config (public config - an toàn)
+    // KHÔNG set OpenRouter API key ra frontend!
     (window as any).NEXT_PUBLIC_FIREBASE_API_KEY = process.env.NEXT_PUBLIC_FIREBASE_API_KEY || '';
     (window as any).NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN = process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || '';
     (window as any).NEXT_PUBLIC_FIREBASE_PROJECT_ID = process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || '';
@@ -20,7 +17,7 @@ export default function AppClient() {
     
     // Debug: Log API key status
     console.log('🔑 Environment API Keys Status:');
-    console.log('- OpenRouter:', process.env.NEXT_PUBLIC_OPENROUTER_API_KEY ? '✅ Found' : '❌ Missing');
+    console.log('- OpenRouter: ❌ Hidden for security');
     console.log('- Firebase:', process.env.NEXT_PUBLIC_FIREBASE_API_KEY ? '✅ Found' : '❌ Missing');
     
   }, []);

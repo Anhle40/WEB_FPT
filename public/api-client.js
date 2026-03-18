@@ -9,8 +9,8 @@ async function sendChatMessage(userMessage) {
   try {
     console.log('🚀 Sending chat request to OpenRouter...');
     
-    // Lấy API key từ environment
-    const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
+    // 🔐 API Key sẽ được lấy từ Backend API - KHÔNG HARDCODE!
+    const OPENROUTER_API_KEY = ''; // Sẽ được thay bằng API call đến backend
     
     if (!OPENROUTER_API_KEY) {
       throw new Error('OpenRouter API Key không được cấu hình! Vui lòng kiểm tra file .env.local');
@@ -63,7 +63,7 @@ QUY TẮC TRẢ LỜI:
         'X-Title': 'FPTU Survival Kit - Chat SOS'
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
+        model: "meta-llama/llama-3.1-8b-instruct",
         messages: messages,
         max_tokens: 250,
         temperature: 0.7
@@ -104,17 +104,21 @@ QUY TẮC TRẢ LỜI:
 }
 
 // Prompt check API function với OpenRouter
-async function checkPrompt(prompt) {
+async function checkPromptAPI(prompt) {
   try {
     console.log('🔍 Checking prompt via OpenRouter...');
+    console.log('🔍 Prompt input:', prompt);
     
-    // Lấy API key từ environment
-    const OPENROUTER_API_KEY = process.env.NEXT_PUBLIC_OPENROUTER_API_KEY || '';
+    // 🔐 API Key sẽ được lấy từ Backend API - KHÔNG HARDCODE!
+    const OPENROUTER_API_KEY = ''; // Sẽ được thay bằng API call đến backend
+    
+    console.log('🔑 API Key check:', OPENROUTER_API_KEY ? '✅ Found' : '❌ Missing');
     
     if (!OPENROUTER_API_KEY) {
       throw new Error('OpenRouter API Key không được cấu hình!');
     }
     
+    console.log('🌐 Making API request...');
     const response = await fetch('https://openrouter.ai/api/v1/chat/completions', {
       method: 'POST',
       headers: {
@@ -124,7 +128,7 @@ async function checkPrompt(prompt) {
         'X-Title': 'FPTU Survival Kit - Prompt Check'
       },
       body: JSON.stringify({
-        model: "meta-llama/llama-3.1-8b-instruct:free",
+        model: "meta-llama/llama-3.1-8b-instruct",
         messages: [
           {
             role: 'system',
@@ -134,11 +138,23 @@ async function checkPrompt(prompt) {
 3. Gợi ý cách cải thiện
 4. Viết lại prompt tốt hơn
 
-Trả về HTML format với:
-- Điểm chất lượng: ⭐⭐⭐...
+Trả về format text thuần với:
+- Điểm chất lượng: ⭐⭐⭐ (1-10 sao)
 - Phân tích ngắn gọn
-- Gợi ý cải thiện
-- Prompt cải tiến`
+- Gợi ý cải thiện cụ thể
+- Prompt cải tiến
+
+Ví dụ:
+⭐⭐⭐⭐⭐
+Prompt của bạn rất rõ ràng và cụ thể. Bạn đã xác định rõ đối tượng (giảng viên) và mục tiêu (xin phép nghỉ học). 
+
+Gợi ý cải thiện:
+- Thêm lý do cụ thể (sức khỏe, gia đình, công việc)
+- Thêm thời gian nghỉ học mong muốn
+- Thêm phương thức liên hệ
+
+Prompt cải tiến:
+"Thưa thầy/cô [Tên giảng viên], em là sinh viên [Mã số] lớp [Tên lớp]. Em viết email này để xin phép nghỉ học từ [ngày bắt đầu] đến [ngày kết thúc] do [lý do cụ thể]. Em sẽ theo dõi bài học trên hệ thống và hoàn thành các bài tập muộn. Em cảm ơn thầy/cô!"`
           },
           {
             role: 'user',
@@ -151,14 +167,20 @@ Trả về HTML format với:
     });
 
     const data = await response.json();
+    console.log('📊 API Response:', data);
+    console.log('📊 Response status:', response.status);
 
     if (!response.ok) {
-      throw new Error(data.error?.message || 'OpenRouter API request failed');
+      console.error('❌ API Error:', data);
+      throw new Error(`OpenRouter API Error: ${response.status} - ${data.error?.message || 'Unknown error'}`);
     }
 
     if (data.choices && data.choices[0] && data.choices[0].message) {
-      return data.choices[0].message.content;
+      const reply = data.choices[0].message.content;
+      console.log('✅ AI Reply:', reply);
+      return reply;
     } else {
+      console.error('❌ Invalid response format:', data);
       throw new Error('Invalid response format from OpenRouter');
     }
 
@@ -166,9 +188,13 @@ Trả về HTML format với:
     console.error('💥 Prompt Check Error:', error);
     
     if (error.message.includes('API Key')) {
-      return '<div class="text-red-500">❌ Lỗi cấu hình: OpenRouter API Key chưa được thiết lập</div>';
+      const errorMsg = '❌ Lỗi cấu hình: OpenRouter API Key chưa được thiết lập';
+      console.log('🔄 Returning error message:', errorMsg);
+      return errorMsg;
     } else {
-      return '<div class="text-red-500">❌ Không thể kiểm tra prompt. Thử lại sau nhé!</div>';
+      const errorMsg = `❌ Không thể kiểm tra prompt: ${error.message}`;
+      console.log('🔄 Returning error message:', errorMsg);
+      return errorMsg;
     }
   }
 }
@@ -181,7 +207,7 @@ function resetConversation() {
 
 // Export functions
 window.sendChatMessage = sendChatMessage;
-window.checkPrompt = checkPrompt;
+window.checkPrompt = checkPromptAPI;
 window.resetConversation = resetConversation;
 
 console.log('🤖 API Client loaded - Using OpenRouter API');

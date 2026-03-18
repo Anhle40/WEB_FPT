@@ -316,16 +316,19 @@
   </style>
   
   <!-- 🚀 Community Module Importer -->
-  <script src="community-importer.js"></script>
+  <!-- <script src="community-importer.js"></script> -->
   
   <!-- 🤖 OpenRouter Client -->
-  <script src="openrouter-client.js"></script>
+  <!-- <script src="openrouter-client.js"></script> -->
   
-  <!-- 🧪 API Test Script -->
-  <script src="api-test.js"></script>
+  <!-- 🤖 Unified AI Client - RE-ENABLE cho Chat AI -->
+  <script src="unified-ai-client.js"></script>
   
-  <!-- 🤖 API Client Script -->
-  <script src="api-client.js"></script>
+  <!-- 🧪 Debug Script - DISABLED -->
+  <!-- <script src="debug-script.js"></script> -->
+  
+  <!-- 🗑️ Old API Client - DISABLED -->
+  <!-- <script src="api-client.js"></script> -->
 </head>
 <body class="text-slate-800 h-screen flex flex-col break-words">
 
@@ -1204,6 +1207,15 @@ document.addEventListener('keydown', e=>{
           
           // 2. Tạo Google Auth Provider với custom configuration
           const provider = new window.GoogleAuthProvider();
+          provider.addScope('email');
+          provider.addScope('profile');
+          
+          // Set custom parameters để bypass domain validation
+          provider.setCustomParameters({
+            'prompt': 'select_account'
+          });
+
+          // 3. Gọi signInWithPopup của Firebase
           provider.addScope('email');
           provider.addScope('profile');
           
@@ -3258,31 +3270,115 @@ document.addEventListener('keydown', e=>{
       setInterval(checkDeadlines, 60000);
   });
   
+  // 🚀 Fallback AI function - Đảm bảo luôn hoạt động
+  async function fallbackPromptCheck(promptText) {
+    // 🔐 API Key sẽ được lấy từ Backend API - KHÔNG HARDCODE!
+    const API_KEY = ''; // Sẽ được thay bằng API call đến backend
+    
+    try {
+      console.log('🚀 Using fallback AI function...');
+      console.log('📝 Prompt:', promptText);
+      
+      const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          "Authorization": `Bearer ${API_KEY}`,
+          "Content-Type": "application/json",
+          "HTTP-Referer": window.location.origin,
+          "X-Title": "FPTU Survival Kit - Check Prompt"
+        },
+        body: JSON.stringify({
+          model: "meta-llama/llama-3.1-8b-instruct",
+          messages: [
+            {
+              role: "system",
+              content: "Bạn là chuyên gia kiểm tra prompt cho sinh viên FPTU. Phân tích prompt và cho điểm 1-10 sao, rồi gợi ý cải thiện. Trả về ngắn gọn."
+            },
+            {
+              role: "user",
+              content: `Kiểm tra prompt: "${promptText}"`
+            }
+          ],
+          temperature: 0.3,
+          max_tokens: 500
+        })
+      });
+
+      console.log('📊 Response status:', response.status);
+
+      if (!response.ok) {
+        const errorData = await response.text();
+        console.error('❌ API Error:', errorData);
+        throw new Error(`API Error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      console.log('✅ API Success:', data);
+
+      if (data.choices && data.choices[0] && data.choices[0].message) {
+        const reply = data.choices[0].message.content;
+        console.log('💬 Fallback AI Reply:', reply);
+        return reply;
+      } else {
+        throw new Error('Invalid response format from API');
+      }
+      
+    } catch (error) {
+      console.error('💥 Fallback AI Error:', error);
+      return '❌ Không thể kết nối AI. Kiểm tra mạng hoặc API key.';
+    }
+  }
+
   async function checkPrompt(){
       const v = document.getElementById('prompt-input').value.trim();
       const r = document.getElementById('prompt-res');
       if(!v) return;
+      
       // loading animation text
       r.innerHTML = `<span class="text-slate-400"><i class='fa-solid fa-spinner fa-spin'></i> Đang phân tích và tối ưu prompt...</span>`;
 
       try {
-          // 🤖 Sử dụng API client (không expose API key)
-          console.log('🔍 Starting prompt check via API route...');
+          // 🤖 Gọi API trực tiếp để tránh undefined
+          console.log('🔍 Starting prompt check via OpenRouter API...');
+          console.log('📝 Prompt input:', v);
           
-          const reply = await window.checkPrompt(v);
+          // Sử dụng hàm window.sendPromptCheck đã được tối ưu
+          let reply;
+          
+          try {
+            console.log('🚀 Using window.sendPromptCheck function...');
+            reply = await window.sendPromptCheck(v);
+            console.log('💬 sendPromptCheck Reply:', reply);
+          } catch (error) {
+            console.error('💥 sendPromptCheck Error:', error);
+            reply = '❌ Không thể kết nối AI: ' + error.message;
+          }
+          
           console.log('💬 AI Reply:', reply);
           
-          // Clean formatting - remove markdown and extra characters
-          let cleanReply = reply
-              .replace(/\*\*/g, '') // Remove ** bold markers
-              .replace(/\*/g, '')   // Remove * italic markers
-              .replace(/#{1,6}\s/g, '') // Remove # headers
-              .replace(/\n{3,}/g, '\n\n') // Reduce multiple newlines
-              .replace(/\n/g, '<br>') // Convert single newlines to <br>
-              .trim();
+          // Kiểm tra nếu reply không hợp lệ
+          if (!reply || typeof reply !== 'string') {
+              console.error('❌ Invalid reply:', reply);
+              r.innerHTML = `<span class="text-red-600 font-bold"><i class='fa-solid fa-triangle-exclamation'></i> AI không trả lời. Thử lại sau nhé!</span>`;
+              return;
+          }
           
-          // Hiển thị cleaned content
-          r.innerHTML = cleanReply;
+          // Bên trong hàm checkPrompt() (app.html), phần xử lý biến reply:
+          
+          // 1. Chuyển đổi **text** thành thẻ <b>text</b> (CSS của web đã style sẵn thẻ <b> rất đẹp)
+          let formattedReply = reply.replace(/\*\*(.*?)\*\*/g, '<b>$1</b>');
+          
+          // 2. Xóa các dấu * in nghiêng thừa thãi (tránh lỗi)
+          formattedReply = formattedReply.replace(/(?<!<)\*(?![^<]*>)/g, '');
+          
+          // 3. Xử lý xuống dòng thành <br>
+          formattedReply = formattedReply.replace(/\n/g, '<br>');
+          
+          // 4. Xử lý khoảng trắng thừa
+          formattedReply = formattedReply.replace(/<br><br><br>/g, '<br><br>');
+          
+          // Hiển thị ra màn hình
+          r.innerHTML = formattedReply;
       } catch (err) {
           console.error(err);
           r.innerHTML = `<span class="text-red-600 font-bold"><i class='fa-solid fa-triangle-exclamation'></i> Lỗi: ${err.message || 'Mất mạng hoặc API'}</span>`;
@@ -3573,7 +3669,9 @@ document.addEventListener('keydown', e=>{
   document.addEventListener('DOMContentLoaded', function() {
       // Add one default component to show the progress bar
       if (typeof addGradeComponent === 'function') {
+      if (typeof addGradeComponent === 'function') {
           addGradeComponent('Progress Test', 10, 'normal');
+      }
       }
   });
   
@@ -3607,20 +3705,23 @@ document.addEventListener('keydown', e=>{
     getDocs
   } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-  // Firebase Configuration - Đọc từ environment variables
+  // Firebase Configuration - Đọc từ environment variables với fallback
   const firebaseConfig = {
-    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "fptu-survival-kit.firebaseapp.com",
-    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "fptu-survival-kit",
-    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "fptu-survival-kit.firebasestorage.app",
-    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "122912571117",
-    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:122912571117:web:cb5bade8d1059f406ed6e4",
-    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-FW2PVZ05XB"
+    apiKey: window.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+    authDomain: window.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
+    projectId: window.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
+    storageBucket: window.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
+    messagingSenderId: window.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
+    appId: window.NEXT_PUBLIC_FIREBASE_APP_ID || "",
+    measurementId: window.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
   };
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  
+  // Tạm thời disable domain validation cho development
+  auth.settings.appVerificationDisabledForTesting = true;
   
   // Tạm thời disable domain validation cho development
   auth.settings.appVerificationDisabledForTesting = true;
