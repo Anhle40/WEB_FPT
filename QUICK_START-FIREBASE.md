@@ -28,12 +28,12 @@ Mở `.env.local` và thêm:
 
 ```env
 # 🔥 Firebase (thay bằng config của bạn)
-NEXT_PUBLIC_FIREBASE_API_KEY=AIzaSyC...
+NEXT_PUBLIC_FIREBASE_API_KEY=your_firebase_api_key_here
 NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN=fptu-survival-kit.firebaseapp.com
 NEXT_PUBLIC_FIREBASE_PROJECT_ID=fptu-survival-kit
 NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET=fptu-survival-kit.appspot.com
-NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=123456789
-NEXT_PUBLIC_FIREBASE_APP_ID=1:123456789:web:abcdef
+NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID=122912571117
+NEXT_PUBLIC_FIREBASE_APP_ID=1:122912571117:web:cb5bade8d1059f406ed6e4
 NEXT_PUBLIC_FIREBASE_DATABASE_URL=https://fptu-survival-kit-default-rtdb.firebaseio.com
 ```
 

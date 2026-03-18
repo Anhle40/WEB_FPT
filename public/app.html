@@ -315,8 +315,11 @@
     }
   </style>
   
-  <!-- 🎨 Markdown Formatter -->
-  <script src="markdown-formatter.js"></script>
+  <!-- 🚀 Community Module Importer -->
+  <script src="community-importer.js"></script>
+  
+  <!-- 🤖 OpenRouter Client -->
+  <script src="openrouter-client.js"></script>
   
   <!-- 🧪 API Test Script -->
   <script src="api-test.js"></script>
@@ -1199,8 +1202,17 @@ document.addEventListener('keydown', e=>{
           
           console.log('🔥 Starting Google login with:', { campus, faculty });
           
-          // 2. Gọi signInWithPopup của Firebase
+          // 2. Tạo Google Auth Provider với custom configuration
           const provider = new window.GoogleAuthProvider();
+          provider.addScope('email');
+          provider.addScope('profile');
+          
+          // Set custom parameters để bypass domain validation
+          provider.setCustomParameters({
+            'prompt': 'select_account'
+          });
+
+          // 3. Gọi signInWithPopup của Firebase
           const result = await window.signInWithPopup(window.firebaseAuth, provider);
           const user = result.user;
           
@@ -3257,7 +3269,7 @@ document.addEventListener('keydown', e=>{
           // 🤖 Sử dụng API client (không expose API key)
           console.log('🔍 Starting prompt check via API route...');
           
-          const reply = await window.sendPromptCheck(v);
+          const reply = await window.checkPrompt(v);
           console.log('💬 AI Reply:', reply);
           
           // Clean formatting - remove markdown and extra characters
@@ -3560,7 +3572,9 @@ document.addEventListener('keydown', e=>{
   // Initialize with default component on page load
   document.addEventListener('DOMContentLoaded', function() {
       // Add one default component to show the progress bar
-      addGradeComponent('Progress Test', 10, 'normal');
+      if (typeof addGradeComponent === 'function') {
+          addGradeComponent('Progress Test', 10, 'normal');
+      }
   });
   
   window.addEventListener('load', () => {
@@ -3595,18 +3609,21 @@ document.addEventListener('keydown', e=>{
 
   // Firebase Configuration - Đọc từ environment variables
   const firebaseConfig = {
-    apiKey: window.FIREBASE_API_KEY || "",
-    authDomain: window.FIREBASE_AUTH_DOMAIN || "",
-    projectId: window.FIREBASE_PROJECT_ID || "",
-    storageBucket: window.FIREBASE_STORAGE_BUCKET || "",
-    messagingSenderId: window.FIREBASE_MESSAGING_SENDER_ID || "",
-    appId: window.FIREBASE_APP_ID || "",
-    measurementId: window.FIREBASE_MEASUREMENT_ID || ""
+    apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY || "",
+    authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "fptu-survival-kit.firebaseapp.com",
+    projectId: process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "fptu-survival-kit",
+    storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "fptu-survival-kit.firebasestorage.app",
+    messagingSenderId: process.env.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "122912571117",
+    appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID || "1:122912571117:web:cb5bade8d1059f406ed6e4",
+    measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || "G-FW2PVZ05XB"
   };
 
   // Initialize Firebase
   const app = initializeApp(firebaseConfig);
   const auth = getAuth(app);
+  
+  // Tạm thời disable domain validation cho development
+  auth.settings.appVerificationDisabledForTesting = true;
   const db = getFirestore(app);
 
   // Make Firebase instances available globally
