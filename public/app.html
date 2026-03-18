@@ -3705,15 +3705,15 @@ document.addEventListener('keydown', e=>{
     getDocs
   } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
 
-  // Firebase Configuration - Đọc từ environment variables với fallback
+  // Firebase Configuration - Đọc từ hardcoded config (public config)
   const firebaseConfig = {
-    apiKey: window.NEXT_PUBLIC_FIREBASE_API_KEY || "",
-    authDomain: window.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN || "",
-    projectId: window.NEXT_PUBLIC_FIREBASE_PROJECT_ID || "",
-    storageBucket: window.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET || "",
-    messagingSenderId: window.NEXT_PUBLIC_FIREBASE_MESSAGING_SENDER_ID || "",
-    appId: window.NEXT_PUBLIC_FIREBASE_APP_ID || "",
-    measurementId: window.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID || ""
+    apiKey: "AIzaSyCnqkftbxic1QGdsV8OqjjtKDzL-4CYJ_0",
+    authDomain: "fptu-survival-kit.firebaseapp.com",
+    projectId: "fptu-survival-kit",
+    storageBucket: "fptu-survival-kit.firebasestorage.app",
+    messagingSenderId: "122912571117",
+    appId: "1:122912571117:web:cb5bade8d1059f406ed6e4",
+    measurementId: "G-FW2PVZ05XB"
   };
 
   // Initialize Firebase
